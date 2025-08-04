@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  CloudFormation template for the TiM time tracking application.  This template
+  defines a VPC with public and private subnets, an Amazon Aurora Serverless
+  database cluster, Cognito user and identity pools for Google SSO, and
+  skeletal Lambda functions fronted by API Gateway.  Actual function code
+  should be packaged separately and referenced via the CodeUri properties.
+
+Parameters:
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+  PrivateSubnet1Cidr:
+    Type: String
+    Default: 10.0.1.0/24
+  PublicSubnet1Cidr:
+    Type: String
+    Default: 10.0.0.0/24
+
+Resources:
+  # VPC and subnets
+  TiMVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      Tags:
+        - Key: Name
+          Value: TiM-VPC
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref TiMVPC
+      CidrBlock: !Ref PublicSubnet1Cidr
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: TiM-PublicSubnet
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref TiMVPC
+      CidrBlock: !Ref PrivateSubnet1Cidr
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: TiM-PrivateSubnet
+
+  # Internet gateway and route tables for public subnet
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref TiMVPC
+      InternetGatewayId: !Ref InternetGateway
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref TiMVPC
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  # DB subnet group
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnets for TiM DB
+      SubnetIds:
+        - !Ref PrivateSubnet
+
+  # Aurora Serverless cluster
+  TiMDatabase:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-postgresql
+      EngineMode: serverless
+      DatabaseName: timdb
+      MasterUsername: admin
+      MasterUserPassword: ChangeMe123!
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      EnableHttpEndpoint: true
+      ScalingConfiguration:
+        AutoPause: true
+        MinCapacity: 2
+        MaxCapacity: 8
+      VpcSecurityGroupIds: []
+
+  # Cognito User Pool for authentication
+  TiMUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: TiMUserPool
+      AutoVerifiedAttributes: [email]
+      AliasAttributes: [preferred_username]
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+
+  # Example Lambda function for API (placeholder)
+  TimeEntryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: TimeEntryFunction
+      Handler: app.handler
+      Runtime: python3.11
+      CodeUri: s3://example-bucket/path/to/time_entry_function.zip
+      MemorySize: 256
+      Timeout: 30
+      Environment:
+        Variables:
+          DATABASE_ARN: !Ref TiMDatabase
+      VpcConfig:
+        SubnetIds:
+          - !Ref PrivateSubnet
+        SecurityGroupIds: []
+
+  # API Gateway for the Lambda functions
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: TiM API
+          version: '1.0'
+        paths:
+          /timeEntries:
+            get:
+              x-amazon-apigateway-integration:
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TimeEntryFunction.Arn}/invocations
+                httpMethod: POST
+                type: aws_proxy
+            post:
+              x-amazon-apigateway-integration:
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TimeEntryFunction.Arn}/invocations
+                httpMethod: POST
+                type: aws_proxy
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway URL
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/
