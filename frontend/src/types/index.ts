@@ -22,6 +22,29 @@ export interface UserProfile {
   lastLoginAt?: string;
 }
 
+// Working Schedule types
+export interface WorkingSchedule {
+  id: string;
+  name: string;
+  timezone: string;
+  scheduleConfig: {
+    workingDays: Array<{
+      day: string;
+      startTime: string;
+      endTime: string;
+      isWorkingDay: boolean;
+    }>;
+    breakTime?: {
+      startTime: string;
+      endTime: string;
+    };
+  };
+  createdBy: string;
+  createdByName?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Customer types
 export interface Customer {
   id: string;

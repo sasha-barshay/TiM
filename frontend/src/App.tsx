@@ -19,6 +19,7 @@ import TimeEntries from './components/screens/TimeEntries';
 import Customers from './components/screens/Customers';
 import Reports from './components/screens/Reports';
 import Profile from './components/screens/Profile';
+import Settings from './components/screens/Settings';
 
 // Admin components
 import UserManagement from './components/admin/UserManagement';
@@ -172,6 +173,17 @@ function App() {
                 <ProtectedRoute>
                   <MobileLayout>
                     <Profile />
+                  </MobileLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <MobileLayout>
+                    <Settings />
                   </MobileLayout>
                 </ProtectedRoute>
               }

@@ -136,6 +136,44 @@ export const usersApi = {
   },
 };
 
+// Working Schedules API
+export const workingSchedulesApi = {
+  getWorkingSchedules: async (params?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<PaginatedResponse<any>> => {
+    const response = await api.get<{ schedules: any[]; pagination: any }>('/working-schedules', { params });
+    return {
+      data: response.data.schedules,
+      pagination: response.data.pagination,
+    };
+  },
+
+  getWorkingSchedule: async (scheduleId: string): Promise<any> => {
+    const response = await api.get<{ schedule: any }>(`/working-schedules/${scheduleId}`);
+    return response.data.schedule;
+  },
+
+  createWorkingSchedule: async (data: any): Promise<any> => {
+    const response = await api.post<{ schedule: any }>('/working-schedules', data);
+    return response.data.schedule;
+  },
+
+  updateWorkingSchedule: async (scheduleId: string, data: any): Promise<any> => {
+    const response = await api.put<{ schedule: any }>(`/working-schedules/${scheduleId}`, data);
+    return response.data.schedule;
+  },
+
+  deleteWorkingSchedule: async (scheduleId: string): Promise<void> => {
+    await api.delete(`/working-schedules/${scheduleId}`);
+  },
+
+  getTimezones: async (): Promise<string[]> => {
+    const response = await api.get<{ timezones: string[] }>('/working-schedules/timezones/list');
+    return response.data.timezones;
+  },
+};
+
 // Customers API
 export const customersApi = {
   getCustomers: async (params?: {
