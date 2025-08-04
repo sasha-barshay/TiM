@@ -12,6 +12,7 @@ const userRoutes = require('./routes/users');
 const customerRoutes = require('./routes/customers');
 const timeEntryRoutes = require('./routes/timeEntries');
 const reportRoutes = require('./routes/reports');
+const workingScheduleRoutes = require('./routes/workingSchedules');
 
 // Import middleware
 const { authenticateToken } = require('./middleware/auth');
@@ -80,6 +81,7 @@ app.use('/api/users', authenticateToken, userRoutes);
 app.use('/api/customers', authenticateToken, customerRoutes);
 app.use('/api/time-entries', authenticateToken, timeEntryRoutes);
 app.use('/api/reports', authenticateToken, reportRoutes);
+app.use('/api/working-schedules', authenticateToken, workingScheduleRoutes);
 
 // Mobile-specific endpoints
 app.get('/api/sync/status', authenticateToken, (req, res) => {
