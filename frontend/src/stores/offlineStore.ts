@@ -142,7 +142,9 @@ export const useOfflineStore = create<OfflineState>()(
 
             // Mark batch as synced
             batch.forEach((entry) => {
-              get().markEntrySynced(entry.id);
+              if (entry.id) {
+                get().markEntrySynced(entry.id);
+              }
             });
           }
 

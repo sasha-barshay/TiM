@@ -12,7 +12,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, error, clearError } = useAuthStore();
+  const { login, clearError } = useAuthStore();
 
   const {
     register,

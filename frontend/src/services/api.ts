@@ -4,7 +4,7 @@ import {
   UserProfile,
   AuthResponse,
   LoginCredentials,
-  RefreshTokenRequest,
+
   Customer,
   TimeEntry,
   TimeEntryFormData,
@@ -16,7 +16,7 @@ import {
   User,
   UserFormData,
   PaginatedResponse,
-  ApiResponse,
+
 } from '../types';
 
 // Create axios instance
@@ -54,7 +54,7 @@ api.interceptors.response.use(
       try {
         const { refreshToken } = useAuthStore.getState();
         if (refreshToken) {
-          const response = await authApi.refreshToken(refreshToken);
+          await authApi.refreshToken(refreshToken);
           useAuthStore.getState().refreshAuth();
           return api(originalRequest);
         }
@@ -68,13 +68,7 @@ api.interceptors.response.use(
   }
 );
 
-// Helper function to handle API responses
-const handleResponse = <T>(response: AxiosResponse<ApiResponse<T>>): T => {
-  if (response.data.error) {
-    throw new Error(response.data.error);
-  }
-  return response.data as T;
-};
+
 
 // Auth API
 export const authApi = {

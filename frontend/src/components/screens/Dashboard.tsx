@@ -7,7 +7,6 @@ import {
   DollarSign,
   TrendingUp,
   Calendar,
-  Users,
   Activity,
 } from 'lucide-react';
 import { DashboardData } from '../../types';
