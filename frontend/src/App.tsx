@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './stores/authStore';
 import { useOfflineStore } from './stores/offlineStore';
@@ -36,6 +36,7 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
     },
   },
 });
@@ -75,19 +76,35 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 function App() {
+  console.log('🎨 App component rendering...');
+  
   const { initializeAuth } = useAuthStore();
   const { initializeOffline } = useOfflineStore();
 
   // Initialize auth and offline functionality
   React.useEffect(() => {
+    console.log('🔧 Initializing auth and offline...');
     initializeAuth();
     initializeOffline();
   }, [initializeAuth, initializeOffline]);
 
+  // Simple test render to see if React is working
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="App">
+          <div style={{ 
+            position: 'fixed', 
+            top: '50px', 
+            left: '10px', 
+            background: 'green', 
+            color: 'white', 
+            padding: '10px', 
+            zIndex: 9999,
+            fontFamily: 'monospace'
+          }}>
+            React App Rendered ✅
+          </div>
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />

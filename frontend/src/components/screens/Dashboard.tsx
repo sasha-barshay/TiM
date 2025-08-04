@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { reportsApi } from '../../services/api';
 import {
@@ -19,14 +19,22 @@ const Dashboard: React.FC = () => {
   const startDate = format(startOfMonth(currentMonth), 'yyyy-MM-dd');
   const endDate = format(endOfMonth(currentMonth), 'yyyy-MM-dd');
 
-  const { data: dashboardData, isLoading, error } = useQuery<DashboardData>(
-    ['dashboard', startDate, endDate],
-    () => reportsApi.getDashboard({ startDate, endDate }),
-    {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      refetchOnWindowFocus: false,
+  // Safe number parsing function
+  const safeNumber = (value: any, defaultValue: number = 0): number => {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? defaultValue : parsed;
     }
-  );
+    return defaultValue;
+  };
+
+  const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
+    queryKey: ['dashboard', startDate, endDate],
+    queryFn: () => reportsApi.getDashboard({ startDate, endDate }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
 
   if (isLoading) {
     return (
@@ -77,7 +85,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Hours</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {summary.totalHours.toFixed(1)}
+                  {safeNumber(summary.totalHours).toFixed(1)}
                 </p>
               </div>
               <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -93,7 +101,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600">Earnings</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  ${summary.totalEarnings.toFixed(0)}
+                  ${safeNumber(summary.totalEarnings).toFixed(0)}
                 </p>
               </div>
               <div className="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center">
@@ -153,7 +161,7 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-gray-900">{stat.count}</p>
-                  <p className="text-xs text-gray-500">{stat.hours.toFixed(1)}h</p>
+                  <p className="text-xs text-gray-500">{safeNumber(stat.hours).toFixed(1)}h</p>
                 </div>
               </div>
             ))}
@@ -178,12 +186,12 @@ const Dashboard: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{customer.name}</p>
-                    <p className="text-xs text-gray-500">{customer.entryCount} entries</p>
+                    <p className="text-xs text-gray-500">{customer.entryCount || 0} entries</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-gray-900">
-                    {customer.totalHours.toFixed(1)}h
+                    {safeNumber(customer.totalHours).toFixed(1)}h
                   </p>
                 </div>
               </div>
@@ -222,7 +230,7 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-gray-900">
-                    {entry.hours.toFixed(1)}h
+                    {safeNumber(entry.hours).toFixed(1)}h
                   </p>
                   <p className="text-xs text-gray-500">{entry.userName}</p>
                 </div>

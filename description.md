@@ -103,3 +103,65 @@ Manual invitation process requires admin to send emails
 Debug tools available for troubleshooting permissions
 All major features functional for multi-user scenarios
 This application provides a complete time tracking and billing solution suitable for consulting firms, agencies, and professional services organizations with multiple clients and team members.
+
+#### GUI
+
+## **1. Dashboard Screen (Main Overview)**
+
+Prompt:
+
+> Design a **dashboard page for a time-tracking and billing app** with a **left sidebar navigation** and a **top bar**. The **sidebar contains icons with labels** for: Dashboard, Time Entries, Customers, Reports, Settings, and User Management. The **main area** should have **three metric cards** at the top displaying “Hours Logged (This Month)”, “Earnings”, and “Active Customers”, each with a subtle pastel gradient background and a large number. Below the metrics, place a **Recent Activity Timeline** showing the latest time entries (customer, hours, date). Use clean spacing, soft card shadows, and a minimalistic, modern look that scales well to mobile (the sidebar collapses into a hamburger menu).
+
+---
+
+## **2. Time Entry Form (Add/Edit Time Entry Screen)**
+
+Prompt:
+
+> Create a **Time Entry form screen** for a time tracking app. The form includes: Date Picker, Start Time and End Time fields (side by side on desktop, stacked on mobile), a dropdown to select Customer, a large Text Area for Work Description, and a Status Selector (Draft, Submitted). Below the form, place a “Save Entry” button. Add validation messages inline (e.g., “Minimum 30 minutes required”). Layout the form inside a card with rounded corners and padding. The top should have a breadcrumb or header “Log Time Entry”.
+
+---
+
+## **3. Customers List Screen (Customer Management)**
+
+Prompt:
+
+> Design a **Customer Management screen** with a table listing Customers. Columns: Customer Name, Contact Info, Status (Active/Archived), Assigned Account Manager. Add a top-right “Add Customer” button. Each row has action buttons (Edit, Archive). On smaller screens, stack customer details vertically per card. Clicking “Add Customer” opens a side drawer or modal with a form to input Name, Billing Info, Timezone, Hourly Rate. Use alternating row backgrounds and responsive columns for mobile.
+
+---
+
+## **4. Reports & Analytics Screen**
+
+Prompt:
+
+> Create a **Reports Dashboard** for time tracking and billing. At the top, place filter controls (date range picker, customer dropdown, status filter). Below, display two charts: a **bar chart showing Monthly Logged Hours** and a **pie chart of Top Customers by Revenue**. Include a **“Export CSV” button**. The layout should adapt to mobile with charts stacking vertically. Use light card backgrounds, rounded edges, and clear chart labels with tooltips.
+
+---
+
+## **5. User Management Screen (Admin Panel)**
+
+Prompt:
+
+> Build a **User Management panel** with a list of users. Each row shows: Name, Email, Role (Admin, Account Manager, Engineer), Status (Active/Inactive), and action buttons (Edit, Remove). At the top, place an “Invite User” button that opens a modal with fields: Email, Role Selector, Timezone. The sidebar navigation remains consistent. For mobile, switch to a card layout per user.
+
+---
+
+## **6. Settings – Working Schedule Templates Screen**
+
+Prompt:
+
+> Design a **Settings screen for Working Schedule Templates**. List all templates with Name, Timezone, and Workdays (e.g., Mon-Fri 09:00-17:00). Each template card has Edit and Delete buttons. At the top, an “Add Template” button opens a form modal. Layout the list as cards on desktop and stacked items on mobile.
+
+---
+
+## **7. Responsive Mobile View Prompt (Global)**
+
+Prompt:
+
+> Ensure all screens adapt to mobile viewports:
+
+* Sidebar collapses into a top hamburger menu.
+* Forms and modals go fullscreen width.
+* Tables transform into stacked lists with vertical content alignment.
+* Cards and metrics rearrange into a single column grid.
+  Maintain large tap targets and readable typography.
