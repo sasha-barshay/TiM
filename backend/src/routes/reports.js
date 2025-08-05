@@ -46,11 +46,13 @@ router.get('/dashboard', [
     baseQuery = baseQuery.whereBetween('te.date', [defaultStartDate, defaultEndDate]);
 
     // Get total hours and earnings
-    const [{ totalHours, totalEarnings }] = await baseQuery.clone()
+    const result = await baseQuery.clone()
       .select(
         db.raw('COALESCE(SUM(te.hours), 0) as total_hours'),
         db.raw('COALESCE(SUM(te.hours * COALESCE((c.billing_info->>\'hourly_rate\')::numeric, 0)), 0) as total_earnings')
       );
+    const totalHours = result[0]?.total_hours || 0;
+    const totalEarnings = result[0]?.total_earnings || 0;
 
     // Get time entries by status
     const statusStats = await baseQuery.clone()
