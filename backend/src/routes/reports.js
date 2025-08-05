@@ -23,9 +23,10 @@ router.get('/dashboard', [
     const userRoles = req.user.roles || [];
     const { startDate, endDate } = req.query;
 
-    // Default to current month if no dates provided
+    // Default to last 30 days if no dates provided
     const now = new Date();
-    const defaultStartDate = startDate || new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const defaultStartDate = startDate || thirtyDaysAgo.toISOString().split('T')[0];
     const defaultEndDate = endDate || now.toISOString().split('T')[0];
 
     // Build base query for time entries
