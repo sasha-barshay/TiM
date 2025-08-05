@@ -78,7 +78,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.VITE_API_URL || 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
       }
@@ -92,7 +92,6 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          charts: ['recharts'],
           utils: ['date-fns', 'clsx', 'tailwind-merge']
         }
       }

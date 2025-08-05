@@ -62,7 +62,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - ${req.ip}`);
+  
   next();
 });
 
@@ -140,21 +140,20 @@ app.use((error, req, res, next) => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
+  
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
+  
   process.exit(0);
 });
 
-// Start server
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`🚀 TiM Backend server running on port ${PORT}`);
-  console.log(`📱 Mobile-optimized API ready`);
-  console.log(`🔒 Security middleware enabled`);
-  console.log(`🗄️  Database connection established`);
-});
+// Start server only if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, '127.0.0.1', () => {
+    console.log(`🚀 TiM Backend server running on port ${PORT}`);
+  });
+}
 
 module.exports = app; 

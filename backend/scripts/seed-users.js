@@ -3,7 +3,7 @@ const db = require('../src/config/database');
 
 async function seedUsers() {
   try {
-    console.log('🌱 Seeding users with hashed passwords...');
+    
 
     const users = [
       {
@@ -44,14 +44,10 @@ async function seedUsers() {
         .onConflict('email')
         .merge(['name', 'password_hash', 'roles', 'timezone', 'is_active']);
       
-      console.log(`✅ User ${user.email} seeded successfully`);
+
     }
 
-    console.log('🎉 All users seeded successfully!');
-    console.log('\n📋 Login Credentials:');
-    console.log('Admin: admin@tim.com / password123');
-    console.log('Manager: manager@tim.com / password123');
-    console.log('Engineer: engineer@tim.com / password123');
+
 
   } catch (error) {
     console.error('❌ Error seeding users:', error);
