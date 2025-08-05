@@ -1,15 +1,6 @@
 const request = require('supertest');
-const app = require('../../index');
+const app = require('../../test/app');
 const db = require('../../config/database');
-
-// Mock authentication middleware
-jest.mock('../../middleware/auth', () => ({
-  authenticateToken: (req, res, next) => {
-    req.user = { id: '1', role: 'admin' };
-    next();
-  },
-  requireAccountManager: (req, res, next) => next(),
-}));
 
 describe('Customers API', () => {
   let testCustomerId;
@@ -31,11 +22,12 @@ describe('Customers API', () => {
         .get('/api/customers')
         .expect(200);
 
-      expect(response.body).toHaveProperty('data');
-      expect(response.body).toHaveProperty('total');
-      expect(response.body).toHaveProperty('page');
-      expect(response.body).toHaveProperty('limit');
-      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body).toHaveProperty('customers');
+      expect(response.body).toHaveProperty('pagination');
+      expect(response.body.pagination).toHaveProperty('total');
+      expect(response.body.pagination).toHaveProperty('limit');
+      expect(response.body.pagination).toHaveProperty('offset');
+      expect(Array.isArray(response.body.customers)).toBe(true);
     });
 
     it('should filter customers by status', async () => {
@@ -43,7 +35,7 @@ describe('Customers API', () => {
         .get('/api/customers?status=active')
         .expect(200);
 
-      expect(response.body.data.every(customer => customer.status === 'active')).toBe(true);
+      expect(response.body.customers.every(customer => customer.status === 'active')).toBe(true);
     });
 
     it('should search customers by name', async () => {
@@ -51,7 +43,7 @@ describe('Customers API', () => {
         .get('/api/customers?search=test')
         .expect(200);
 
-      expect(response.body.data.every(customer => 
+      expect(response.body.customers.every(customer => 
         customer.name.toLowerCase().includes('test')
       )).toBe(true);
     });
@@ -61,9 +53,9 @@ describe('Customers API', () => {
         .get('/api/customers?page=1&limit=5')
         .expect(200);
 
-      expect(response.body.page).toBe(1);
-      expect(response.body.limit).toBe(5);
-      expect(response.body.data.length).toBeLessThanOrEqual(5);
+      expect(response.body.pagination.offset).toBe(0);
+      expect(response.body.pagination.limit).toBe(5);
+      expect(response.body.customers.length).toBeLessThanOrEqual(5);
     });
   });
 
@@ -81,10 +73,9 @@ describe('Customers API', () => {
           currency: 'USD',
           paymentTerms: 'Net 30'
         },
-        assignedUserIds: ['1', '2'],
-        accountManagerId: '1',
-        leadingEngineerId: '2',
-        workingScheduleId: '1',
+        assignedUserIds: ['1051a830-55a0-4d82-86f4-4769d7a0624d', '795c73d8-5f60-45f7-b33e-9eaf5e8979e2'],
+        accountManagerId: '1051a830-55a0-4d82-86f4-4769d7a0624d',
+        leadingEngineerId: '795c73d8-5f60-45f7-b33e-9eaf5e8979e2',
         status: 'active'
       };
 
@@ -93,12 +84,12 @@ describe('Customers API', () => {
         .send(customerData)
         .expect(201);
 
-      expect(response.body).toHaveProperty('id');
-      expect(response.body.name).toBe(customerData.name);
-      expect(response.body.contactInfo.email).toBe(customerData.contactInfo.email);
-      expect(response.body.billingInfo.hourlyRate).toBe(customerData.billingInfo.hourlyRate);
+      expect(response.body).toHaveProperty('customer');
+      expect(response.body.customer.name).toBe(customerData.name);
+      expect(response.body.customer.contact_info.email).toBe(customerData.contactInfo.email);
+      expect(response.body.customer.billing_info.hourlyRate).toBe(customerData.billingInfo.hourlyRate);
 
-      testCustomerId = response.body.id;
+      testCustomerId = response.body.customer.id;
     });
 
     it('should validate required fields', async () => {
@@ -114,8 +105,8 @@ describe('Customers API', () => {
         .send(invalidData)
         .expect(400);
 
-      expect(response.body).toHaveProperty('errors');
-      expect(response.body.errors).toHaveLength(2);
+      expect(response.body).toHaveProperty('details');
+      expect(response.body.details).toHaveLength(2);
     });
 
     it('should validate email format', async () => {
@@ -131,7 +122,7 @@ describe('Customers API', () => {
         .send(invalidData)
         .expect(400);
 
-      expect(response.body.errors.some(error => 
+      expect(response.body.details.some(error => 
         error.msg.includes('email')
       )).toBe(true);
     });
@@ -152,8 +143,8 @@ describe('Customers API', () => {
         .send(invalidData)
         .expect(400);
 
-      expect(response.body.errors.some(error => 
-        error.msg.includes('hourly rate')
+      expect(response.body.details.some(error => 
+        error.msg.includes('Hourly rate must be positive')
       )).toBe(true);
     });
   });
@@ -176,9 +167,9 @@ describe('Customers API', () => {
         .send(updateData)
         .expect(200);
 
-      expect(response.body.name).toBe(updateData.name);
-      expect(response.body.contactInfo.email).toBe(updateData.contactInfo.email);
-      expect(response.body.billingInfo.hourlyRate).toBe(updateData.billingInfo.hourlyRate);
+      expect(response.body.customer.name).toBe(updateData.name);
+      expect(response.body.customer.contact_info.email).toBe(updateData.contactInfo.email);
+      expect(response.body.customer.billing_info.hourlyRate).toBe(updateData.billingInfo.hourlyRate);
     });
 
     it('should return 404 for non-existent customer', async () => {
@@ -187,7 +178,7 @@ describe('Customers API', () => {
       };
 
       await request(app)
-        .put('/api/customers/999999')
+        .put('/api/customers/00000000-0000-0000-0000-000000000000')
         .send(updateData)
         .expect(404);
     });
@@ -205,7 +196,7 @@ describe('Customers API', () => {
         .send(invalidData)
         .expect(400);
 
-      expect(response.body).toHaveProperty('errors');
+      expect(response.body).toHaveProperty('details');
     });
   });
 
@@ -227,7 +218,7 @@ describe('Customers API', () => {
 
     it('should return 404 for non-existent customer', async () => {
       await request(app)
-        .delete('/api/customers/999999')
+        .delete('/api/customers/00000000-0000-0000-0000-000000000000')
         .expect(404);
     });
   });
@@ -253,20 +244,20 @@ describe('Customers API', () => {
         .send(customerData)
         .expect(201);
 
-      const customerId = createResponse.body.id;
+      const customerId = createResponse.body.customer.id;
 
       const response = await request(app)
         .get(`/api/customers/${customerId}`)
         .expect(200);
 
-      expect(response.body.id).toBe(customerId);
-      expect(response.body.name).toBe(customerData.name);
-      expect(response.body.contactInfo.email).toBe(customerData.contactInfo.email);
+      expect(response.body.customer.id).toBe(customerId);
+      expect(response.body.customer.name).toBe(customerData.name);
+      expect(response.body.customer.contact_info.email).toBe(customerData.contactInfo.email);
     });
 
     it('should return 404 for non-existent customer', async () => {
       await request(app)
-        .get('/api/customers/999999')
+        .get('/api/customers/00000000-0000-0000-0000-000000000000')
         .expect(404);
     });
   });

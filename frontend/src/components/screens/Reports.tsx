@@ -16,20 +16,22 @@ const Reports: React.FC = () => {
   });
 
   // Fetch dashboard data for reports
-  const { data: dashboardData, isLoading: dashboardLoading } = useQuery<DashboardData>({
+  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useQuery<DashboardData>({
     queryKey: ['dashboard', filters.startDate, filters.endDate],
     queryFn: () => reportsApi.getDashboard({ 
       startDate: filters.startDate, 
       endDate: filters.endDate 
     }),
     staleTime: 5 * 60 * 1000,
+    retry: 2,
   });
 
   // Fetch time entries report
-  const { data: timeEntriesReport, isLoading: entriesLoading } = useQuery({
+  const { data: timeEntriesReport, isLoading: entriesLoading, error: entriesError } = useQuery({
     queryKey: ['timeEntriesReport', filters],
     queryFn: () => reportsApi.getTimeEntriesReport(filters),
     staleTime: 5 * 60 * 1000,
+    retry: 2,
   });
 
   // Fetch customers for filter
@@ -56,6 +58,29 @@ const Reports: React.FC = () => {
     }
   };
 
+  // Handle errors
+  if (dashboardError || entriesError) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="text-red-500 mb-4">
+            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load reports</h3>
+          <p className="text-gray-600 mb-4">Please try refreshing the page or check your connection.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn btn-primary"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (dashboardLoading || entriesLoading || customersLoading) {
     return (
       <div className="flex items-center justify-center min-h-64">
@@ -66,7 +91,13 @@ const Reports: React.FC = () => {
 
   const customers = customersData?.data || [];
   const timeEntries = timeEntriesReport?.timeEntries || [];
-  const { summary, statusStats, topCustomers, monthlyTrend } = dashboardData || {};
+  
+  // Handle nested API response structure
+  const dashboard = dashboardData || {};
+  const summary = dashboard.summary || {};
+  const statusStats = dashboard.statusStats || [];
+  const topCustomers = dashboard.topCustomers || [];
+  const monthlyTrend = dashboard.monthlyTrend || [];
 
   // Prepare chart data
   const monthlyChartData = monthlyTrend?.map((month) => ({
@@ -81,6 +112,9 @@ const Reports: React.FC = () => {
     revenue: customer.totalHours * 100, // Default hourly rate for chart
   })) || [];
 
+  // Check if we have any data to display
+  const hasData = summary.totalHours > 0 || timeEntries.length > 0;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -92,6 +126,7 @@ const Reports: React.FC = () => {
         <button
           onClick={handleExport}
           className="btn btn-primary flex items-center space-x-2"
+          disabled={!hasData}
         >
           <Download className="w-4 h-4" />
           <span>Export CSV</span>
@@ -149,75 +184,96 @@ const Reports: React.FC = () => {
         </div>
       </div>
 
+      {/* No Data State */}
+      {!hasData && (
+        <div className="card">
+          <div className="card-body">
+            <div className="text-center py-12">
+              <BarChart3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Data Available</h3>
+              <p className="text-gray-600 mb-4">
+                No time entries found for the selected date range and filters.
+              </p>
+              <p className="text-sm text-gray-500">
+                Try adjusting the date range or filters to see more data.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="card">
-          <div className="card-body p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Hours</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.totalHours?.toFixed(1) || '0.0'}
-                </p>
-              </div>
-              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-primary-600" />
+      {hasData && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="card">
+            <div className="card-body p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Hours</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {summary?.totalHours?.toFixed(1) || '0.0'}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-primary-600" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="card">
-          <div className="card-body p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${summary?.totalEarnings?.toFixed(0) || '0'}
-                </p>
-              </div>
-              <div className="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-success-600" />
+          <div className="card">
+            <div className="card-body p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    ${summary?.totalEarnings?.toFixed(0) || '0'}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-success-600" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="card">
-          <div className="card-body p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Entries</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.totalEntries || 0}
-                </p>
-              </div>
-              <div className="w-10 h-10 bg-warning-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-warning-600" />
+          <div className="card">
+            <div className="card-body p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Entries</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {summary?.totalEntries || 0}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-warning-100 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-warning-600" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="card">
-          <div className="card-body p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Avg Hours/Day</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.totalHours ? (summary.totalHours / 30).toFixed(1) : '0.0'}
-                </p>
-              </div>
-              <div className="w-10 h-10 bg-info-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-info-600" />
+          <div className="card">
+            <div className="card-body p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Avg Hours/Day</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {summary?.totalHours ? (summary.totalHours / 30).toFixed(1) : '0.0'}
+                  </p>
+                </div>
+                <div className="w-10 h-10 bg-info-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-info-600" />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {hasData && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Hours Chart */}
         <div className="card">
           <div className="card-header">
@@ -301,45 +357,49 @@ const Reports: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Status Breakdown */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="text-lg font-semibold text-gray-900">Status Breakdown</h2>
-        </div>
-        <div className="card-body">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {statusStats?.map((stat) => (
-              <div key={stat.status} className="text-center p-4 border rounded-lg">
-                <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center status-${stat.status}`}>
-                  <span className="text-lg font-bold text-white">
-                    {stat.count}
-                  </span>
+      {hasData && statusStats.length > 0 && (
+        <div className="card">
+          <div className="card-header">
+            <h2 className="text-lg font-semibold text-gray-900">Status Breakdown</h2>
+          </div>
+          <div className="card-body">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {statusStats?.map((stat) => (
+                <div key={stat.status} className="text-center p-4 border rounded-lg">
+                  <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center status-${stat.status}`}>
+                    <span className="text-lg font-bold text-white">
+                      {stat.count}
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900 capitalize">
+                    {stat.status}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {stat.hours?.toFixed(1) || '0.0'} hours
+                  </p>
                 </div>
-                <p className="text-sm font-medium text-gray-900 capitalize">
-                  {stat.status}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {stat.hours?.toFixed(1) || '0.0'} hours
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Time Entries Table */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="text-lg font-semibold text-gray-900">Time Entries Report</h2>
-        </div>
-        <div className="card-body">
-          {timeEntries.length === 0 ? (
-            <div className="text-center py-8">
-              <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No time entries found for the selected filters</p>
-            </div>
-          ) : (
+      {hasData && (
+        <div className="card">
+          <div className="card-header">
+            <h2 className="text-lg font-semibold text-gray-900">Time Entries Report</h2>
+          </div>
+          <div className="card-body">
+            {timeEntries.length === 0 ? (
+              <div className="text-center py-8">
+                <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No time entries found for the selected filters</p>
+              </div>
+            ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -395,6 +455,7 @@ const Reports: React.FC = () => {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 };

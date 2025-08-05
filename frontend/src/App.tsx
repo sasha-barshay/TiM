@@ -46,16 +46,17 @@ const queryClient = new QueryClient({
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuthStore();
 
+  // Show login page immediately if not authenticated (for testing)
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <LoadingSpinner size="lg" />
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
@@ -77,35 +78,19 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 function App() {
-  console.log('🎨 App component rendering...');
-  
   const { initializeAuth } = useAuthStore();
   const { initializeOffline } = useOfflineStore();
 
   // Initialize auth and offline functionality
   React.useEffect(() => {
-    console.log('🔧 Initializing auth and offline...');
     initializeAuth();
     initializeOffline();
   }, [initializeAuth, initializeOffline]);
 
-  // Simple test render to see if React is working
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="App">
-          <div style={{ 
-            position: 'fixed', 
-            top: '50px', 
-            left: '10px', 
-            background: 'green', 
-            color: 'white', 
-            padding: '10px', 
-            zIndex: 9999,
-            fontFamily: 'monospace'
-          }}>
-            React App Rendered ✅
-          </div>
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />

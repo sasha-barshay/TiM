@@ -10,6 +10,13 @@
   box-sizing: border-box;
 }
 
+/* Hide any test/debug elements */
+div[style*="position: fixed"][style*="top: 50px"][style*="left: 10px"][style*="background: green"],
+div[style*="position: fixed"][style*="top: 10px"][style*="right: 10px"][style*="background: red"],
+div[id="debug-info"] {
+  display: none !important;
+}
+
 html {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -208,6 +215,23 @@ body {
 
   .status-rejected {
     @apply status-badge bg-danger-100 text-danger-800;
+  }
+
+  /* Status indicator classes for charts */
+  .status-draft {
+    @apply bg-gray-500;
+  }
+
+  .status-submitted {
+    @apply bg-warning-500;
+  }
+
+  .status-approved {
+    @apply bg-success-500;
+  }
+
+  .status-rejected {
+    @apply bg-danger-500;
   }
 
   /* Pull to refresh indicator */

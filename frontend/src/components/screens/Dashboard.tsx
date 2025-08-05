@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
            stat.status === 'draft' ? '#6b7280' : '#ef4444',
   })) || [];
 
-  const maxHours = Math.max(...monthlyChartData.map(d => d.hours), 1);
+  const maxHours = Math.max(...monthlyChartData.map(d => safeNumber(d.hours)), 1);
 
   return (
     <div className="space-y-6">
@@ -226,12 +226,12 @@ const Dashboard: React.FC = () => {
                 <div key={index} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">{data.month}</span>
-                    <span className="text-sm font-semibold text-gray-900">{data.hours.toFixed(1)}h</span>
+                    <span className="text-sm font-semibold text-gray-900">{safeNumber(data.hours).toFixed(1)}h</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
                       className="bg-primary-500 h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${(data.hours / maxHours) * 100}%` }}
+                      style={{ width: `${(safeNumber(data.hours) / maxHours) * 100}%` }}
                     />
                   </div>
                 </div>
@@ -260,7 +260,7 @@ const Dashboard: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-gray-900">{stat.value}</p>
-                    <p className="text-xs text-gray-500">{stat.hours?.toFixed(1)}h</p>
+                    <p className="text-xs text-gray-500">{safeNumber(stat.hours).toFixed(1)}h</p>
                   </div>
                 </div>
               ))}
