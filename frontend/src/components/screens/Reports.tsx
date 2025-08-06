@@ -29,7 +29,13 @@ const Reports: React.FC = () => {
   // Fetch time entries report
   const { data: timeEntriesReport, isLoading: entriesLoading, error: entriesError } = useQuery({
     queryKey: ['timeEntriesReport', filters],
-    queryFn: () => reportsApi.getTimeEntriesReport(filters),
+    queryFn: () => {
+      // Filter out empty parameters to avoid validation errors
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      return reportsApi.getTimeEntriesReport(cleanFilters);
+    },
     staleTime: 5 * 60 * 1000,
     retry: 2,
   });
@@ -43,7 +49,11 @@ const Reports: React.FC = () => {
   // Handle CSV export
   const handleExport = async () => {
     try {
-      const blob = await reportsApi.exportTimeEntries(filters);
+      // Filter out empty parameters to avoid validation errors
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      const blob = await reportsApi.exportTimeEntries(cleanFilters);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
