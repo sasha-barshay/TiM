@@ -103,20 +103,20 @@ const Reports: React.FC = () => {
   const timeEntries = timeEntriesReport?.timeEntries || [];
   
   // Handle nested API response structure
-  const dashboard = dashboardData || {};
+  const dashboard = dashboardData || {} as DashboardData;
   const summary = dashboard.summary || {};
   const statusStats = dashboard.statusStats || [];
   const topCustomers = dashboard.topCustomers || [];
   const monthlyTrend = dashboard.monthlyTrend || [];
 
   // Prepare chart data
-  const monthlyChartData = monthlyTrend?.map((month) => ({
+  const monthlyChartData = monthlyTrend?.map((month: any) => ({
     month: format(new Date(month.month), 'MMM yyyy'),
     hours: month.totalHours,
     entries: month.entryCount,
   })) || [];
 
-  const customerChartData = topCustomers?.slice(0, 5).map((customer) => ({
+  const customerChartData = topCustomers?.slice(0, 5).map((customer: any) => ({
     name: customer.name,
     hours: customer.totalHours || 0,
     revenue: (customer.totalHours || 0) * 100, // Default hourly rate for chart
@@ -293,14 +293,14 @@ const Reports: React.FC = () => {
             <div className="h-64 flex items-center justify-center">
               {monthlyChartData.length > 0 ? (
                 <div className="w-full space-y-3">
-                  {monthlyChartData.map((data, index) => (
+                  {monthlyChartData.map((data: any, index: number) => (
                     <div key={index} className="flex items-center space-x-3">
                       <div className="w-20 text-sm text-gray-600">{data.month}</div>
                       <div className="flex-1 bg-gray-200 rounded-full h-4">
                         <div
                           className="bg-primary-500 h-4 rounded-full transition-all duration-300"
                                                       style={{
-                              width: `${Math.min((data.hours / Math.max(...monthlyChartData.map(d => d.hours || 0), 1)) * 100, 100)}%`
+                              width: `${Math.min((data.hours / Math.max(...monthlyChartData.map((d: any) => d.hours || 0), 1)) * 100, 100)}%`
                             }}
                         />
                       </div>
@@ -329,7 +329,7 @@ const Reports: React.FC = () => {
             <div className="h-64 flex items-center justify-center">
               {customerChartData.length > 0 ? (
                 <div className="w-full space-y-3">
-                  {customerChartData.map((customer, index) => (
+                  {customerChartData.map((customer: any, index: number) => (
                     <div key={index} className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
                         <span className="text-xs font-semibold text-primary-600">
@@ -346,7 +346,7 @@ const Reports: React.FC = () => {
                           <div
                             className="bg-success-500 h-2 rounded-full"
                             style={{
-                              width: `${Math.min((customer.hours / Math.max(...customerChartData.map(c => c.hours || 0), 1)) * 100, 100)}%`
+                              width: `${Math.min((customer.hours / Math.max(...customerChartData.map((c: any) => c.hours || 0), 1)) * 100, 100)}%`
                             }}
                           />
                         </div>
@@ -377,7 +377,7 @@ const Reports: React.FC = () => {
           </div>
           <div className="card-body">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {statusStats?.map((stat) => (
+              {statusStats?.map((stat: any) => (
                 <div key={stat.status} className="text-center p-4 border rounded-lg">
                   <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center status-${stat.status}`}>
                     <span className="text-lg font-bold text-white">
