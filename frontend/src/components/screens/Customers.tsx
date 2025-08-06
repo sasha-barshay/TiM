@@ -31,7 +31,13 @@ const Customers: React.FC = () => {
   // Fetch customers
   const { data: customersData, isLoading: customersLoading } = useQuery({
     queryKey: ['customers', filters],
-    queryFn: () => customersApi.getCustomers(filters),
+    queryFn: () => {
+      // Filter out empty parameters to avoid validation errors
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      return customersApi.getCustomers(cleanFilters);
+    },
   });
 
   // Fetch users for assignment

@@ -23,7 +23,13 @@ const TimeEntries: React.FC = () => {
   // Fetch time entries
   const { data: timeEntriesData, isLoading: entriesLoading } = useQuery({
     queryKey: ['timeEntries', filters],
-    queryFn: () => timeEntriesApi.getTimeEntries(filters),
+    queryFn: () => {
+      // Filter out empty parameters to avoid validation errors
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      return timeEntriesApi.getTimeEntries(cleanFilters);
+    },
   });
 
   // Fetch customers for dropdown
