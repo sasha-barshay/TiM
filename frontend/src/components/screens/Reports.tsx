@@ -221,7 +221,7 @@ const Reports: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Hours</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {summary?.totalHours?.toFixed(1) || '0.0'}
+                    {(Number(summary?.totalHours) || 0).toFixed(1)}
                   </p>
                 </div>
                 <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -237,7 +237,7 @@ const Reports: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Revenue</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    ${summary?.totalEarnings?.toFixed(0) || '0'}
+                    ${(Number(summary?.totalEarnings) || 0).toFixed(0)}
                   </p>
                 </div>
                 <div className="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center">
@@ -269,7 +269,7 @@ const Reports: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Avg Hours/Day</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {summary?.totalHours ? (summary.totalHours / 30).toFixed(1) : '0.0'}
+                    {summary?.totalHours ? (Number(summary.totalHours) / 30).toFixed(1) : '0.0'}
                   </p>
                 </div>
                 <div className="w-10 h-10 bg-info-100 rounded-lg flex items-center justify-center">
@@ -305,7 +305,7 @@ const Reports: React.FC = () => {
                         />
                       </div>
                       <div className="w-16 text-sm font-medium text-gray-900">
-                        {(data.hours || 0).toFixed(1)}h
+                        {(Number(data.hours) || 0).toFixed(1)}h
                       </div>
                     </div>
                   ))}
@@ -351,7 +351,7 @@ const Reports: React.FC = () => {
                           />
                         </div>
                         <span className="text-sm font-medium text-gray-900 w-12 text-right">
-                          {(customer.hours || 0).toFixed(1)}h
+                          {(Number(customer.hours) || 0).toFixed(1)}h
                         </span>
                       </div>
                     </div>
@@ -388,7 +388,7 @@ const Reports: React.FC = () => {
                     {stat.status}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {(stat.hours || 0).toFixed(1)} hours
+                    {(Number(stat.hours) || 0).toFixed(1)} hours
                   </p>
                 </div>
               ))}
@@ -447,7 +447,7 @@ const Reports: React.FC = () => {
                         {entry.description || 'No description'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {(entry.hours || 0).toFixed(1)}h
+                        {(Number(entry.hours) || 0).toFixed(1)}h
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`status-badge status-${entry.status}`}>
