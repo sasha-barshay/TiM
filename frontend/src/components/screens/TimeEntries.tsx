@@ -264,7 +264,7 @@ const TimeEntries: React.FC = () => {
                   <div className="flex items-center space-x-4">
                     <div className="text-right">
                       <p className="text-sm font-semibold text-gray-900">
-                        {entry.hours.toFixed(1)}h
+                        {(entry.hours || 0).toFixed(1)}h
                       </p>
                       <p className="text-xs text-gray-500">{entry.userName}</p>
                     </div>

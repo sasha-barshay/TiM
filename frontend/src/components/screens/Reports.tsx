@@ -299,9 +299,9 @@ const Reports: React.FC = () => {
                       <div className="flex-1 bg-gray-200 rounded-full h-4">
                         <div
                           className="bg-primary-500 h-4 rounded-full transition-all duration-300"
-                          style={{
-                            width: `${Math.min((data.hours / Math.max(...monthlyChartData.map(d => d.hours))) * 100, 100)}%`
-                          }}
+                                                      style={{
+                              width: `${Math.min((data.hours / Math.max(...monthlyChartData.map(d => d.hours || 0), 1)) * 100, 100)}%`
+                            }}
                         />
                       </div>
                       <div className="w-16 text-sm font-medium text-gray-900">
@@ -346,7 +346,7 @@ const Reports: React.FC = () => {
                           <div
                             className="bg-success-500 h-2 rounded-full"
                             style={{
-                              width: `${Math.min((customer.hours / Math.max(...customerChartData.map(c => c.hours))) * 100, 100)}%`
+                              width: `${Math.min((customer.hours / Math.max(...customerChartData.map(c => c.hours || 0), 1)) * 100, 100)}%`
                             }}
                           />
                         </div>
