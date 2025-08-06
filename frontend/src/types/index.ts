@@ -59,18 +59,18 @@ export interface Customer {
     currency?: string;
     paymentTerms?: string;
   };
-  assignedUserIds: string[];
-  accountManagerId?: string;
-  leadingEngineerId?: string;
-  workingScheduleId?: string;
+  assigned_user_ids: string[];
+  account_manager_id?: string;
+  leading_engineer_id?: string;
+  working_schedule_id?: string;
   status: 'active' | 'inactive' | 'archived';
-  accountManagerName?: string;
-  leadingEngineerName?: string;
+  account_manager_name?: string;
+  leading_engineer_name?: string;
   workingScheduleName?: string;
   workingScheduleConfig?: any;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
 }
 
 // Time Entry types

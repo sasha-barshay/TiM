@@ -228,39 +228,39 @@ const Customers: React.FC = () => {
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{customer.name}</div>
                             <div className="text-sm text-gray-500">
-                              Created {format(new Date(customer.createdAt), 'MMM d, yyyy')}
+                              Created {customer.created_at ? format(new Date(customer.created_at), 'MMM d, yyyy') : 'Unknown date'}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {customer.contactInfo?.email || 'No email'}
+                                                        {customer.contact_info?.email || 'No email'}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {customer.contactInfo?.phone || 'No phone'}
+                                                      {customer.contact_info?.phone || 'No phone'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4 text-gray-400" />
                           <span className="text-sm text-gray-900">
-                            {customer.assignedUserIds?.length || 0} members
+                            {customer.assigned_user_ids?.length || 0} members
                           </span>
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          {customer.accountManagerName && `AM: ${customer.accountManagerName}`}
+                          {customer.account_manager_name && `AM: ${customer.account_manager_name}`}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center space-x-2">
                           <DollarSign className="w-4 h-4 text-gray-400" />
                           <span className="text-sm text-gray-900">
-                            ${customer.billingInfo?.hourlyRate || '0'}/hr
+                            ${customer.billing_info?.hourly_rate || '0'}/hr
                           </span>
                         </div>
                         <div className="text-xs text-gray-500">
-                          {customer.billingInfo?.currency || 'USD'}
+                          {customer.billing_info?.currency || 'USD'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
