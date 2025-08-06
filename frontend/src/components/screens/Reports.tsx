@@ -388,7 +388,7 @@ const Reports: React.FC = () => {
                     {stat.status}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {stat.hours?.toFixed(1) || '0.0'} hours
+                    {(stat.hours || 0).toFixed(1)} hours
                   </p>
                 </div>
               ))}
