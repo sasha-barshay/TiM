@@ -5,11 +5,11 @@ export interface User {
   name: string;
   roles: string[];
   timezone: string;
-  avatarUrl?: string;
-  lastLoginAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  isActive: boolean;
+  avatar_url?: string;
+  last_login_at?: string;
+  created_at: string;
+  updated_at: string;
+  is_active: boolean;
 }
 
 export interface UserProfile {
@@ -18,8 +18,8 @@ export interface UserProfile {
   name: string;
   roles: string[];
   timezone: string;
-  avatarUrl?: string;
-  lastLoginAt?: string;
+  avatar_url?: string;
+  last_login_at?: string;
 }
 
 // Working Schedule types
@@ -39,25 +39,25 @@ export interface WorkingSchedule {
       endTime: string;
     };
   };
-  createdBy: string;
-  createdByName?: string;
-  createdAt: string;
-  updatedAt: string;
+  created_by: string;
+  created_by_name?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Customer types
 export interface Customer {
   id: string;
   name: string;
-  contactInfo?: {
+  contact_info?: {
     email?: string;
     phone?: string;
     address?: string;
   };
-  billingInfo?: {
-    hourlyRate?: number;
+  billing_info?: {
+    hourly_rate?: number;
     currency?: string;
-    paymentTerms?: string;
+    payment_terms?: string;
   };
   assigned_user_ids: string[];
   account_manager_id?: string;
@@ -66,8 +66,8 @@ export interface Customer {
   status: 'active' | 'inactive' | 'archived';
   account_manager_name?: string;
   leading_engineer_name?: string;
-  workingScheduleName?: string;
-  workingScheduleConfig?: any;
+  working_schedule_name?: string;
+  working_schedule_config?: any;
   created_at: string;
   updated_at: string;
   created_by: string;
@@ -76,8 +76,8 @@ export interface Customer {
 // Time Entry types
 export interface TimeEntry {
   id: string;
-  userId: string;
-  customerId: string;
+  user_id: string;
+  customer_id: string;
   date: string;
   startTime?: string;
   endTime?: string;
@@ -95,12 +95,12 @@ export interface TimeEntry {
     url: string;
     type: string;
   }>;
-  customerName?: string;
-  billingInfo?: any;
-  userName?: string;
-  createdAt: string;
-  updatedAt: string;
-  syncedAt?: string;
+  customer_name?: string;
+  billing_info?: any;
+  user_name?: string;
+  created_at: string;
+  updated_at: string;
+  synced_at?: string;
 }
 
 // Invitation types
@@ -108,12 +108,12 @@ export interface Invitation {
   id: string;
   email: string;
   roles: string[];
-  invitedBy: string;
+  invited_by: string;
   token: string;
-  expiresAt: string;
-  acceptedAt?: string;
-  invitedByName?: string;
-  createdAt: string;
+  expires_at: string;
+  accepted_at?: string;
+  invited_by_name?: string;
+  created_at: string;
 }
 
 // Report types
@@ -155,12 +155,12 @@ export interface DashboardData {
 }
 
 export interface TimeEntriesReport {
-  timeEntries: TimeEntry[];
+  time_entries: TimeEntry[];
   summary: {
-    totalHours: number;
-    totalEarnings: number;
-    totalEntries: number;
-    totalCount: number;
+    total_hours: number;
+    total_earnings: number;
+    total_entries: number;
+    total_count: number;
   };
   pagination: {
     total: number;
@@ -260,20 +260,20 @@ export interface TimeEntryFormData {
 
 export interface CustomerFormData {
   name: string;
-  contactInfo?: {
+  contact_info?: {
     email?: string;
     phone?: string;
     address?: string;
   };
-  billingInfo?: {
-    hourlyRate?: number;
+  billing_info?: {
+    hourly_rate?: number;
     currency?: string;
-    paymentTerms?: string;
+    payment_terms?: string;
   };
-  assignedUserIds: string[];
-  accountManagerId?: string;
-  leadingEngineerId?: string;
-  workingScheduleId?: string;
+  assigned_user_ids: string[];
+  account_manager_id?: string;
+  leading_engineer_id?: string;
+  working_schedule_id?: string;
   status: string;
 }
 

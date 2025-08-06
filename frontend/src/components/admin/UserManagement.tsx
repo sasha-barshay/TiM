@@ -218,7 +218,7 @@ const UserManagement: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {user.lastLoginAt
-                          ? format(new Date(user.lastLoginAt), 'MMM d, yyyy')
+                          ? format(new Date(user.last_login_at), 'MMM d, yyyy')
                           : 'Never'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -294,7 +294,7 @@ const UserManagement: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-500">
-                      Expires: {format(new Date(invitation.expiresAt), 'MMM d, yyyy')}
+                      Expires: {format(new Date(invitation.expires_at), 'MMM d, yyyy')}
                     </p>
                     <p className="text-xs text-gray-500">
                       Invited by: {invitation.invitedByName || 'Unknown'}

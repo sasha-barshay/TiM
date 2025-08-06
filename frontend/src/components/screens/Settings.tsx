@@ -203,7 +203,7 @@ const Settings: React.FC = () => {
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{schedule.name}</div>
                             <div className="text-sm text-gray-500">
-                              Created {format(new Date(schedule.createdAt), 'MMM d, yyyy')}
+                              Created {format(new Date(schedule.created_at), 'MMM d, yyyy')}
                             </div>
                           </div>
                         </div>
