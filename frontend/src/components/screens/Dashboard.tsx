@@ -344,11 +344,11 @@ const Dashboard: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2 text-xs text-gray-500 mt-1">
-                      <span>{entry.customerName}</span>
+                                              <span>{entry.customer_name}</span>
                       <span>•</span>
                       <span>{format(new Date(entry.date), 'MMM d, yyyy')}</span>
                       <span>•</span>
-                      <span>{entry.userName}</span>
+                                              <span>{entry.user_name}</span>
                     </div>
                   </div>
                 </div>

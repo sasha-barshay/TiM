@@ -210,9 +210,9 @@ const TimeEntries: React.FC = () => {
                         <div
                           key={entry.id}
                           className="text-xs p-1 bg-primary-100 text-primary-700 rounded truncate"
-                          title={`${entry.customerName}: ${entry.hours}h - ${entry.description}`}
+                          title={`${entry.customer_name}: ${entry.hours}h - ${entry.description}`}
                         >
-                          {entry.customerName}: {entry.hours}h
+                                                      {entry.customer_name}: {entry.hours}h
                         </div>
                       ))}
                       {dayEntries.length > 2 && (
@@ -255,7 +255,7 @@ const TimeEntries: React.FC = () => {
                           {entry.description || 'No description'}
                         </p>
                         <div className="flex items-center space-x-2 text-xs text-gray-500">
-                          <span>{entry.customerName}</span>
+                          <span>{entry.customer_name}</span>
                           <span>•</span>
                           <span>{format(parseISO(entry.date), 'MMM d, yyyy')}</span>
                           <span>•</span>
@@ -272,7 +272,7 @@ const TimeEntries: React.FC = () => {
                       <p className="text-sm font-semibold text-gray-900">
                         {(Number(entry.hours) || 0).toFixed(1)}h
                       </p>
-                      <p className="text-xs text-gray-500">{entry.userName}</p>
+                                              <p className="text-xs text-gray-500">{entry.user_name}</p>
                     </div>
                     
                     <button

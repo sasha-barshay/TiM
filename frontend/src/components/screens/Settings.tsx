@@ -216,17 +216,17 @@ const Settings: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {schedule.scheduleConfig.workingDays.filter(day => day.isWorkingDay).length} days
+                          {schedule.schedule_config.working_days.filter(day => day.is_working_day).length} days
                         </div>
                         <div className="text-xs text-gray-500">
-                          {schedule.scheduleConfig.workingDays
-                            .filter(day => day.isWorkingDay)
+                          {schedule.schedule_config.working_days
+                            .filter(day => day.is_working_day)
                             .map(day => day.day.substring(0, 3))
                             .join(', ')}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{schedule.createdByName || 'Unknown'}</div>
+                        <div className="text-sm text-gray-900">{schedule.created_by_name || 'Unknown'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-2">

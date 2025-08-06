@@ -441,7 +441,7 @@ const Reports: React.FC = () => {
                         {format(new Date(entry.date), 'MMM d, yyyy')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {entry.customerName}
+                        {entry.customer_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
                         {entry.description || 'No description'}
@@ -455,7 +455,7 @@ const Reports: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {entry.userName}
+                        {entry.user_name}
                       </td>
                     </tr>
                   ))}

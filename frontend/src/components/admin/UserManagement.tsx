@@ -297,7 +297,7 @@ const UserManagement: React.FC = () => {
                       Expires: {format(new Date(invitation.expires_at), 'MMM d, yyyy')}
                     </p>
                     <p className="text-xs text-gray-500">
-                      Invited by: {invitation.invitedByName || 'Unknown'}
+                                              Invited by: {invitation.invited_by_name || 'Unknown'}
                     </p>
                   </div>
                 </div>

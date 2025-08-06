@@ -104,8 +104,8 @@ const Customers: React.FC = () => {
       const searchLower = filters.search.toLowerCase();
       return (
         customer.name.toLowerCase().includes(searchLower) ||
-        (customer.contactInfo?.email && customer.contactInfo.email.toLowerCase().includes(searchLower)) ||
-        (customer.contactInfo?.phone && customer.contactInfo.phone.toLowerCase().includes(searchLower))
+        (customer.contact_info?.email && customer.contact_info.email.toLowerCase().includes(searchLower)) ||
+        (customer.contact_info?.phone && customer.contact_info.phone.toLowerCase().includes(searchLower))
       );
     }
     return true;
@@ -365,20 +365,20 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
 }) => {
   const [formData, setFormData] = useState({
     name: customer?.name || '',
-    contactInfo: customer?.contactInfo || {
+    contact_info: customer?.contact_info || {
       email: '',
       phone: '',
       address: '',
     },
-    billingInfo: customer?.billingInfo || {
-      hourlyRate: 0,
+    billing_info: customer?.billing_info || {
+      hourly_rate: 0,
       currency: 'USD',
-      paymentTerms: 'Net 30',
+      payment_terms: 'Net 30',
     },
-    assignedUserIds: customer?.assignedUserIds || [],
-    accountManagerId: customer?.accountManagerId || '',
-    leadingEngineerId: customer?.leadingEngineerId || '',
-    workingScheduleId: customer?.workingScheduleId || '',
+    assigned_user_ids: customer?.assigned_user_ids || [],
+    account_manager_id: customer?.account_manager_id || '',
+    leading_engineer_id: customer?.leading_engineer_id || '',
+    working_schedule_id: customer?.working_schedule_id || '',
     status: customer?.status || 'active',
   });
 
@@ -451,10 +451,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 <label className="form-label">Email</label>
                 <input
                   type="email"
-                  value={formData.contactInfo.email}
+                  value={formData.contact_info.email}
                   onChange={(e) => setFormData({
                     ...formData,
-                    contactInfo: { ...formData.contactInfo, email: e.target.value }
+                                          contact_info: { ...formData.contact_info, email: e.target.value }
                   })}
                   className="form-input"
                   placeholder="customer@example.com"
