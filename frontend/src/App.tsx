@@ -49,11 +49,16 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   // Auto-login for development/testing
   React.useEffect(() => {
     if (!isAuthenticated && !isLoading) {
+      console.log('Attempting auto-login...');
       // Auto-login with test credentials for development
       login({
         email: 'admin@tim.com',
         password: 'password123'
-      }).catch(console.error);
+      }).then(() => {
+        console.log('Auto-login successful');
+      }).catch((error) => {
+        console.error('Auto-login failed:', error);
+      });
     }
   }, [isAuthenticated, isLoading, login]);
 
