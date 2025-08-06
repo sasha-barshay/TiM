@@ -396,9 +396,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   const handleUserToggle = (userId: string) => {
     setFormData(prev => ({
       ...prev,
-      assignedUserIds: prev.assignedUserIds.includes(userId)
-        ? prev.assignedUserIds.filter(id => id !== userId)
-        : [...prev.assignedUserIds, userId]
+      assigned_user_ids: prev.assigned_user_ids.includes(userId)
+        ? prev.assigned_user_ids.filter(id => id !== userId)
+        : [...prev.assigned_user_ids, userId]
     }));
   };
 
@@ -464,10 +464,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 <label className="form-label">Phone</label>
                 <input
                   type="tel"
-                  value={formData.contactInfo.phone}
+                  value={formData.contact_info.phone}
                   onChange={(e) => setFormData({
                     ...formData,
-                    contactInfo: { ...formData.contactInfo, phone: e.target.value }
+                                          contact_info: { ...formData.contact_info, phone: e.target.value }
                   })}
                   className="form-input"
                   placeholder="+1 (555) 123-4567"
@@ -477,10 +477,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
             <div className="mt-4">
               <label className="form-label">Address</label>
               <textarea
-                value={formData.contactInfo.address}
+                value={formData.contact_info.address}
                 onChange={(e) => setFormData({
                   ...formData,
-                  contactInfo: { ...formData.contactInfo, address: e.target.value }
+                                        contact_info: { ...formData.contact_info, address: e.target.value }
                 })}
                 className="form-textarea"
                 rows={3}
@@ -499,10 +499,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                   type="number"
                   step="0.01"
                   min="0"
-                  value={formData.billingInfo.hourlyRate}
+                  value={formData.billing_info.hourly_rate}
                   onChange={(e) => setFormData({
                     ...formData,
-                    billingInfo: { ...formData.billingInfo, hourlyRate: parseFloat(e.target.value) || 0 }
+                                          billing_info: { ...formData.billing_info, hourly_rate: parseFloat(e.target.value) || 0 }
                   })}
                   className="form-input"
                   placeholder="0.00"
@@ -511,10 +511,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <div>
                 <label className="form-label">Currency</label>
                 <select
-                  value={formData.billingInfo.currency}
+                  value={formData.billing_info.currency}
                   onChange={(e) => setFormData({
                     ...formData,
-                    billingInfo: { ...formData.billingInfo, currency: e.target.value }
+                                          billing_info: { ...formData.billing_info, currency: e.target.value }
                   })}
                   className="form-select"
                 >
@@ -527,10 +527,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <div>
                 <label className="form-label">Payment Terms</label>
                 <select
-                  value={formData.billingInfo.paymentTerms}
+                  value={formData.billing_info.payment_terms}
                   onChange={(e) => setFormData({
                     ...formData,
-                    billingInfo: { ...formData.billingInfo, paymentTerms: e.target.value }
+                                          billing_info: { ...formData.billing_info, payment_terms: e.target.value }
                   })}
                   className="form-select"
                 >
@@ -550,8 +550,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <div>
                 <label className="form-label">Account Manager</label>
                 <select
-                  value={formData.accountManagerId}
-                  onChange={(e) => setFormData({ ...formData, accountManagerId: e.target.value })}
+                  value={formData.account_manager_id}
+                                      onChange={(e) => setFormData({ ...formData, account_manager_id: e.target.value })}
                   className="form-select"
                 >
                   <option value="">Select Account Manager</option>
@@ -563,8 +563,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <div>
                 <label className="form-label">Leading Engineer</label>
                 <select
-                  value={formData.leadingEngineerId}
-                  onChange={(e) => setFormData({ ...formData, leadingEngineerId: e.target.value })}
+                  value={formData.leading_engineer_id}
+                                      onChange={(e) => setFormData({ ...formData, leading_engineer_id: e.target.value })}
                   className="form-select"
                 >
                   <option value="">Select Leading Engineer</option>
@@ -586,7 +586,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                       <label key={user.id} className="flex items-center space-x-3">
                         <input
                           type="checkbox"
-                          checked={formData.assignedUserIds.includes(user.id)}
+                          checked={formData.assigned_user_ids.includes(user.id)}
                           onChange={() => handleUserToggle(user.id)}
                           className="form-checkbox"
                         />
@@ -644,9 +644,9 @@ interface CustomerDetailsProps {
 }
 
 const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onClose }) => {
-  const assignedUsers = users.filter(user => customer.assignedUserIds?.includes(user.id));
-  const accountManager = users.find(user => user.id === customer.accountManagerId);
-  const leadingEngineer = users.find(user => user.id === customer.leadingEngineerId);
+      const assignedUsers = users.filter(user => customer.assigned_user_ids?.includes(user.id));
+    const accountManager = users.find(user => user.id === customer.account_manager_id);
+    const leadingEngineer = users.find(user => user.id === customer.leading_engineer_id);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -698,20 +698,20 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onCl
               <div>
                 <label className="text-sm font-medium text-gray-700">Email</label>
                 <p className="text-sm text-gray-900 mt-1">
-                  {customer.contactInfo?.email || 'Not provided'}
+                                          {customer.contact_info?.email || 'Not provided'}
                 </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700">Phone</label>
                 <p className="text-sm text-gray-900 mt-1">
-                  {customer.contactInfo?.phone || 'Not provided'}
+                                          {customer.contact_info?.phone || 'Not provided'}
                 </p>
               </div>
             </div>
-            {customer.contactInfo?.address && (
+                                    {customer.contact_info?.address && (
               <div className="mt-4">
                 <label className="text-sm font-medium text-gray-700">Address</label>
-                <p className="text-sm text-gray-900 mt-1">{customer.contactInfo.address}</p>
+                                        <p className="text-sm text-gray-900 mt-1">{customer.contact_info.address}</p>
               </div>
             )}
           </div>
@@ -723,13 +723,13 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onCl
               <div>
                 <label className="text-sm font-medium text-gray-700">Hourly Rate</label>
                 <p className="text-sm text-gray-900 mt-1">
-                  ${customer.billingInfo?.hourlyRate || '0'} {customer.billingInfo?.currency || 'USD'}
+                                          ${customer.billing_info?.hourly_rate || '0'} {customer.billing_info?.currency || 'USD'}
                 </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700">Payment Terms</label>
                 <p className="text-sm text-gray-900 mt-1">
-                  {customer.billingInfo?.paymentTerms || 'Not set'}
+                                          {customer.billing_info?.payment_terms || 'Not set'}
                 </p>
               </div>
             </div>
