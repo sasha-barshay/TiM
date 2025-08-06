@@ -118,8 +118,8 @@ const Reports: React.FC = () => {
 
   const customerChartData = topCustomers?.slice(0, 5).map((customer) => ({
     name: customer.name,
-    hours: customer.totalHours,
-    revenue: customer.totalHours * 100, // Default hourly rate for chart
+    hours: customer.totalHours || 0,
+    revenue: (customer.totalHours || 0) * 100, // Default hourly rate for chart
   })) || [];
 
   // Check if we have any data to display
@@ -305,7 +305,7 @@ const Reports: React.FC = () => {
                         />
                       </div>
                       <div className="w-16 text-sm font-medium text-gray-900">
-                        {data.hours.toFixed(1)}h
+                        {(data.hours || 0).toFixed(1)}h
                       </div>
                     </div>
                   ))}
@@ -351,7 +351,7 @@ const Reports: React.FC = () => {
                           />
                         </div>
                         <span className="text-sm font-medium text-gray-900 w-12 text-right">
-                          {customer.hours.toFixed(1)}h
+                          {(customer.hours || 0).toFixed(1)}h
                         </span>
                       </div>
                     </div>
@@ -447,7 +447,7 @@ const Reports: React.FC = () => {
                         {entry.description || 'No description'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {entry.hours.toFixed(1)}h
+                        {(entry.hours || 0).toFixed(1)}h
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`status-badge status-${entry.status}`}>
