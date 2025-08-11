@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './stores/authStore';
 import { useOfflineStore } from './stores/offlineStore';
+import GoogleOAuthProvider from './components/auth/GoogleOAuthProvider';
 
 // Layout components
 import Layout from './components/layout/Layout';
@@ -105,25 +106,26 @@ function App() {
   }, [initializeAuth, initializeOffline]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className="App">
-          <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/invite" element={<InviteAccept />} />
+    <GoogleOAuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <div className="App">
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/invite" element={<InviteAccept />} />
 
-            {/* Protected routes */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <MobileLayout>
-                    <Dashboard />
-                  </MobileLayout>
-                </ProtectedRoute>
-              }
-            />
+              {/* Protected routes */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <MobileLayout>
+                      <Dashboard />
+                    </MobileLayout>
+                  </ProtectedRoute>
+                }
+              />
 
             <Route
               path="/dashboard"
@@ -237,6 +239,7 @@ function App() {
         </div>
       </Router>
     </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 }
 

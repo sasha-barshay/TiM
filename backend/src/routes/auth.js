@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const db = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const { verifyGoogleToken, extractGoogleUserInfo } = require('../config/google');
 
 const router = express.Router();
 
@@ -11,6 +12,8 @@ const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
+
+
 
 // Generate JWT token
 const generateToken = (userId, roles) => {
@@ -192,20 +195,28 @@ router.post('/google', [
 
     const { idToken } = req.body;
 
-    // In production, verify the Google ID token
-    // For now, we'll simulate the verification
-    // const ticket = await client.verifyIdToken({
-    //   idToken,
-    //   audience: process.env.GOOGLE_CLIENT_ID
-    // });
-    // const payload = ticket.getPayload();
+    // Verify the Google ID token
+    let payload;
+    try {
+      payload = await verifyGoogleToken(idToken);
+    } catch (verifyError) {
+      console.error('Google token verification failed:', verifyError);
+      return res.status(401).json({
+        error: verifyError.message,
+        code: 'INVALID_GOOGLE_TOKEN'
+      });
+    }
 
-    // Simulate Google user data
-    const googleUser = {
-      email: 'user@example.com',
-      name: 'Google User',
-      picture: 'https://example.com/avatar.jpg'
-    };
+    // Extract user information from Google payload
+    const googleUser = extractGoogleUserInfo(payload);
+
+    // Verify email is verified
+    if (!googleUser.emailVerified) {
+      return res.status(400).json({
+        error: 'Email not verified with Google',
+        code: 'EMAIL_NOT_VERIFIED'
+      });
+    }
 
     // Find or create user
     let user = await db('users')
@@ -213,26 +224,33 @@ router.post('/google', [
       .first();
 
     if (!user) {
-      // Create new user
+      // Create new user with default engineer role
       const [newUser] = await db('users')
         .insert({
           email: googleUser.email,
           name: googleUser.name,
           avatar_url: googleUser.picture,
-          roles: ['engineer'], // Default role
-          timezone: 'UTC'
+          roles: ['engineer'], // Default role for new Google users
+          timezone: 'UTC',
+          is_active: true
         })
         .returning('*');
 
       user = newUser;
+    } else if (!user.is_active) {
+      return res.status(403).json({
+        error: 'Account is deactivated',
+        code: 'ACCOUNT_DEACTIVATED'
+      });
     }
 
-    // Update last login
+    // Update last login and avatar
     await db('users')
       .where({ id: user.id })
       .update({ 
         last_login_at: new Date(),
-        avatar_url: googleUser.picture
+        avatar_url: googleUser.picture,
+        name: googleUser.name // Update name in case it changed
       });
 
     // Generate tokens
