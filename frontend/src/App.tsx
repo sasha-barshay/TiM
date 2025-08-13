@@ -10,6 +10,9 @@ import GoogleOAuthProvider from './components/auth/GoogleOAuthProvider';
 import Layout from './components/layout/Layout';
 import MobileLayout from './components/layout/MobileLayout';
 
+// Hooks
+import useResponsive from './hooks/useResponsive';
+
 // Auth components
 import Login from './components/auth/Login';
 import InviteAccept from './components/auth/InviteAccept';
@@ -27,6 +30,8 @@ import UserManagement from './components/admin/UserManagement';
 
 // Loading component
 import LoadingSpinner from './components/common/LoadingSpinner';
+
+
 
 // Styles
 import './index.css';
@@ -98,12 +103,16 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 function App() {
   const { initializeAuth } = useAuthStore();
   const { initializeOffline } = useOfflineStore();
+  const { isMobile, isTablet } = useResponsive();
 
   // Initialize auth and offline functionality
   React.useEffect(() => {
     initializeAuth();
     initializeOffline();
   }, [initializeAuth, initializeOffline]);
+
+  // Determine which layout to use based on screen size
+  const shouldUseMobileLayout = isMobile || isTablet;
 
   return (
     <GoogleOAuthProvider>
@@ -120,9 +129,15 @@ function App() {
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <MobileLayout>
-                      <Dashboard />
-                    </MobileLayout>
+                    {shouldUseMobileLayout ? (
+                      <MobileLayout>
+                        <Dashboard />
+                      </MobileLayout>
+                    ) : (
+                      <Layout>
+                        <Dashboard />
+                      </Layout>
+                    )}
                   </ProtectedRoute>
                 }
               />
@@ -131,9 +146,15 @@ function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <MobileLayout>
-                    <Dashboard />
-                  </MobileLayout>
+                  {shouldUseMobileLayout ? (
+                    <MobileLayout>
+                      <Dashboard />
+                    </MobileLayout>
+                  ) : (
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -142,9 +163,15 @@ function App() {
               path="/time-entries"
               element={
                 <ProtectedRoute>
-                  <MobileLayout>
-                    <TimeEntries />
-                  </MobileLayout>
+                  {shouldUseMobileLayout ? (
+                    <MobileLayout>
+                      <TimeEntries />
+                    </MobileLayout>
+                  ) : (
+                    <Layout>
+                      <TimeEntries />
+                    </Layout>
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -153,9 +180,15 @@ function App() {
               path="/customers"
               element={
                 <ProtectedRoute>
-                  <MobileLayout>
-                    <Customers />
-                  </MobileLayout>
+                  {shouldUseMobileLayout ? (
+                    <MobileLayout>
+                      <Customers />
+                    </MobileLayout>
+                  ) : (
+                    <Layout>
+                      <Customers />
+                    </Layout>
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -164,9 +197,15 @@ function App() {
               path="/reports"
               element={
                 <ProtectedRoute>
-                  <MobileLayout>
-                    <Reports />
-                  </MobileLayout>
+                  {shouldUseMobileLayout ? (
+                    <MobileLayout>
+                      <Reports />
+                    </MobileLayout>
+                  ) : (
+                    <Layout>
+                      <Reports />
+                    </Layout>
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -175,9 +214,15 @@ function App() {
               path="/profile"
               element={
                 <ProtectedRoute>
-                  <MobileLayout>
-                    <Profile />
-                  </MobileLayout>
+                  {shouldUseMobileLayout ? (
+                    <MobileLayout>
+                      <Profile />
+                    </MobileLayout>
+                  ) : (
+                    <Layout>
+                      <Profile />
+                    </Layout>
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -186,9 +231,15 @@ function App() {
               path="/settings"
               element={
                 <ProtectedRoute>
-                  <MobileLayout>
-                    <Settings />
-                  </MobileLayout>
+                  {shouldUseMobileLayout ? (
+                    <MobileLayout>
+                      <Settings />
+                    </MobileLayout>
+                  ) : (
+                    <Layout>
+                      <Settings />
+                    </Layout>
+                  )}
                 </ProtectedRoute>
               }
             />
