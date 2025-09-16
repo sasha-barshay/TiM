@@ -51,34 +51,6 @@ router.get('/', [
   }
 });
 
-// Get user by ID
-router.get('/:userId', requireAdmin, async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const user = await db('users')
-      .where({ id: userId })
-      .select('id', 'email', 'name', 'roles', 'timezone', 'avatar_url', 'created_at', 'last_login_at', 'is_active')
-      .first();
-
-    if (!user) {
-      return res.status(404).json({
-        error: 'User not found',
-        code: 'USER_NOT_FOUND'
-      });
-    }
-
-    res.json({ user });
-
-  } catch (error) {
-    console.error('Get user error:', error);
-    res.status(500).json({
-      error: 'Failed to get user',
-      code: 'GET_USER_ERROR'
-    });
-  }
-});
-
 // Create user invitation
 router.post('/invite', [
   body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
@@ -207,7 +179,7 @@ router.post('/invite/accept', [
     if (!invitation) {
       return res.status(404).json({
         error: 'Invalid invitation token',
-        code: 'INVALID_INVITATION_TOKEN'
+        code: 'INVITATION_EXPIRED'
       });
     }
 
@@ -261,6 +233,34 @@ router.post('/invite/accept', [
     res.status(500).json({
       error: 'Failed to accept invitation',
       code: 'ACCEPT_INVITATION_ERROR'
+    });
+  }
+});
+
+// Get user by ID
+router.get('/:userId', requireAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await db('users')
+      .where({ id: userId })
+      .select('id', 'email', 'name', 'roles', 'timezone', 'avatar_url', 'created_at', 'last_login_at', 'is_active')
+      .first();
+
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        code: 'USER_NOT_FOUND'
+      });
+    }
+
+    res.json({ user });
+
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({
+      error: 'Failed to get user',
+      code: 'GET_USER_ERROR'
     });
   }
 });
@@ -336,7 +336,7 @@ router.delete('/:userId', requireAdmin, async (req, res) => {
 
     const updated = await db('users')
       .where({ id: userId })
-      .update({ 
+      .update({
         is_active: false,
         updated_at: new Date()
       });
@@ -359,4 +359,4 @@ router.delete('/:userId', requireAdmin, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

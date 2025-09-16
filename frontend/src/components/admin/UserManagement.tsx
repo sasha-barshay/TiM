@@ -84,7 +84,7 @@ const UserManagement: React.FC = () => {
   // Filter users based on current filters
   const filteredUsers = users.filter((user) => {
     if (filters.role && !user.roles.includes(filters.role)) return false;
-    if (filters.status && user.isActive !== (filters.status === 'active')) return false;
+    if (filters.status && user.is_active !== (filters.status === 'active')) return false;
     return true;
   });
 
@@ -113,7 +113,7 @@ const UserManagement: React.FC = () => {
               <Shield className="w-4 h-4 text-gray-400" />
               <span className="text-sm font-medium text-gray-700">Filters:</span>
             </div>
-            
+
             <select
               value={filters.role}
               onChange={(e) => setFilters({ ...filters, role: e.target.value })}
@@ -208,12 +208,12 @@ const UserManagement: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            user.isActive
+                            user.is_active
                               ? 'bg-green-100 text-green-800'
                               : 'bg-red-100 text-red-800'
                           }`}
                         >
-                          {user.isActive ? 'Active' : 'Inactive'}
+                          {user.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -347,12 +347,12 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({ onSubmit, onCancel, isL
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.email) {
       toast.error('Please enter an email address');
       return;
     }
-    
+
     if (formData.roles.length === 0) {
       toast.error('Please select at least one role');
       return;
@@ -374,7 +374,7 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({ onSubmit, onCancel, isL
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Invite New User</h3>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="form-label">Email Address</label>
@@ -448,7 +448,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ user, onSubmit, onCancel, i
     name: user.name,
     email: user.email,
     roles: user.roles,
-    isActive: user.isActive,
+    isActive: user.is_active,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -469,7 +469,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ user, onSubmit, onCancel, i
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Edit User</h3>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="form-label">Name</label>
@@ -552,4 +552,4 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ user, onSubmit, onCancel, i
   );
 };
 
-export default UserManagement; 
+export default UserManagement;

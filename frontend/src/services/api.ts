@@ -73,26 +73,26 @@ api.interceptors.response.use(
 // Auth API
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/api/auth/login', credentials);
+    const response = await api.post<AuthResponse>('/auth/login', credentials);
     return response.data;
   },
 
   loginWithGoogle: async (idToken: string): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/api/auth/google', { idToken });
+    const response = await api.post<AuthResponse>('/auth/google', { idToken });
     return response.data;
   },
 
   refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/api/auth/refresh', { refreshToken });
+    const response = await api.post<AuthResponse>('/auth/refresh', { refreshToken });
     return response.data;
   },
 
   logout: async (): Promise<void> => {
-    await api.post('/api/auth/logout');
+    await api.post('/auth/logout');
   },
 
   getProfile: async (): Promise<UserProfile> => {
-    const response = await api.get<{ user: UserProfile }>('/api/auth/profile');
+    const response = await api.get<{ user: UserProfile }>('/auth/profile');
     return response.data.user;
   },
 };
@@ -100,7 +100,7 @@ export const authApi = {
 // Users API
 export const usersApi = {
   getUsers: async (params?: { limit?: number; offset?: number }): Promise<PaginatedResponse<User>> => {
-    const response = await api.get<{ users: User[]; pagination: any }>('/api/users', { params });
+    const response = await api.get<{ users: User[]; pagination: any }>('/users', { params });
     return {
       data: response.data.users,
       pagination: response.data.pagination,
@@ -113,17 +113,17 @@ export const usersApi = {
   },
 
   createInvitation: async (data: { email: string; roles: string[] }): Promise<Invitation> => {
-    const response = await api.post<{ invitation: Invitation }>('/api/users/invite', data);
+    const response = await api.post<{ invitation: Invitation }>('/users/invite', data);
     return response.data.invitation;
   },
 
   getInvitations: async (): Promise<Invitation[]> => {
-    const response = await api.get<{ invitations: Invitation[] }>('/api/users/invitations');
+    const response = await api.get<{ invitations: Invitation[] }>('/users/invitations');
     return response.data.invitations;
   },
 
   acceptInvitation: async (data: { token: string; name: string; password: string }): Promise<void> => {
-    await api.post('/api/users/invite/accept', data);
+    await api.post('/users/invite/accept', data);
   },
 
   updateUser: async (userId: string, data: Partial<UserFormData>): Promise<User> => {
@@ -142,7 +142,7 @@ export const workingSchedulesApi = {
     limit?: number;
     offset?: number;
   }): Promise<PaginatedResponse<any>> => {
-    const response = await api.get<{ schedules: any[]; pagination: any }>('/api/working-schedules', { params });
+    const response = await api.get<{ schedules: any[]; pagination: any }>('/working-schedules', { params });
     return {
       data: response.data.schedules,
       pagination: response.data.pagination,
@@ -155,7 +155,7 @@ export const workingSchedulesApi = {
   },
 
   createWorkingSchedule: async (data: any): Promise<any> => {
-    const response = await api.post<{ schedule: any }>('/api/working-schedules', data);
+    const response = await api.post<{ schedule: any }>('/working-schedules', data);
     return response.data.schedule;
   },
 
@@ -169,7 +169,7 @@ export const workingSchedulesApi = {
   },
 
   getTimezones: async (): Promise<string[]> => {
-    const response = await api.get<{ timezones: string[] }>('/api/working-schedules/timezones/list');
+    const response = await api.get<{ timezones: string[] }>('/working-schedules/timezones/list');
     return response.data.timezones;
   },
 };
@@ -181,7 +181,7 @@ export const customersApi = {
     limit?: number;
     offset?: number;
   }): Promise<PaginatedResponse<Customer>> => {
-    const response = await api.get<{ customers: Customer[]; pagination: any }>('/api/customers', { params });
+    const response = await api.get<{ customers: Customer[]; pagination: any }>('/customers', { params });
     return {
       data: response.data.customers,
       pagination: response.data.pagination,
@@ -194,7 +194,7 @@ export const customersApi = {
   },
 
   createCustomer: async (data: CustomerFormData): Promise<Customer> => {
-    const response = await api.post<{ customer: Customer }>('/api/customers', data);
+    const response = await api.post<{ customer: Customer }>('/customers', data);
     return response.data.customer;
   },
 
@@ -223,7 +223,7 @@ export const timeEntriesApi = {
     limit?: number;
     offset?: number;
   }): Promise<TimeEntriesReport> => {
-    const response = await api.get<TimeEntriesReport>('/api/time-entries', { params });
+    const response = await api.get<TimeEntriesReport>('/time-entries', { params });
     return response.data;
   },
 
@@ -233,12 +233,12 @@ export const timeEntriesApi = {
   },
 
   createTimeEntry: async (data: TimeEntryFormData): Promise<TimeEntry> => {
-    const response = await api.post<{ timeEntry: TimeEntry }>('/api/time-entries', data);
+    const response = await api.post<{ timeEntry: TimeEntry }>('/time-entries', data);
     return response.data.timeEntry;
   },
 
   createQuickTimeEntry: async (data: { customerId: string; hours: number; description?: string }): Promise<TimeEntry> => {
-    const response = await api.post<{ timeEntry: TimeEntry }>('/api/time-entries/quick', data);
+    const response = await api.post<{ timeEntry: TimeEntry }>('/time-entries/quick', data);
     return response.data.timeEntry;
   },
 
@@ -252,7 +252,7 @@ export const timeEntriesApi = {
   },
 
   syncOfflineEntries: async (entries: any[]): Promise<any> => {
-    const response = await api.post('/api/time-entries/sync', { entries });
+    const response = await api.post('/time-entries/sync', { entries });
     return response.data;
   },
 };
@@ -260,7 +260,7 @@ export const timeEntriesApi = {
 // Reports API
 export const reportsApi = {
   getDashboard: async (params?: { startDate?: string; endDate?: string }): Promise<DashboardData> => {
-    const response = await api.get<{ dashboard: DashboardData }>('/api/reports/dashboard', { params });
+    const response = await api.get<{ dashboard: DashboardData }>('/reports/dashboard', { params });
     return response.data.dashboard;
   },
 
@@ -273,7 +273,7 @@ export const reportsApi = {
     limit?: number;
     offset?: number;
   }): Promise<TimeEntriesReport> => {
-    const response = await api.get<TimeEntriesReport>('/api/reports/time-entries', { params });
+    const response = await api.get<TimeEntriesReport>('/reports/time-entries', { params });
     return response.data;
   },
 
@@ -284,7 +284,7 @@ export const reportsApi = {
     userId?: string;
     status?: string;
   }): Promise<Blob> => {
-    const response = await api.get('/api/reports/time-entries/export', {
+    const response = await api.get('/reports/time-entries/export', {
       params,
       responseType: 'blob',
     });
@@ -303,7 +303,7 @@ export const reportsApi = {
 // Sync API
 export const syncApi = {
   getSyncStatus: async (): Promise<any> => {
-    const response = await api.get('/api/sync/status');
+    const response = await api.get('/sync/status');
     return response.data;
   },
 };
