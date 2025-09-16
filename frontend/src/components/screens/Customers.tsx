@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { 
-  Plus, 
-  Edit, 
-  Archive, 
-  Users, 
-  DollarSign, 
-  Building2, 
+import {
+  Plus,
+  Edit,
+  Archive,
+  Users,
+  DollarSign,
+  Building2,
   Filter,
   Search,
   Eye
@@ -16,6 +16,7 @@ import { customersApi, usersApi } from '../../services/api';
 import { Customer, User } from '../../types';
 import LoadingSpinner from '../common/LoadingSpinner';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../stores/authStore';
 
 const Customers: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -26,6 +27,7 @@ const Customers: React.FC = () => {
     search: '',
   });
 
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
 
   // Fetch customers
@@ -150,7 +152,7 @@ const Customers: React.FC = () => {
               <Filter className="w-4 h-4 text-gray-400" />
               <span className="text-sm font-medium text-gray-700">Filters:</span>
             </div>
-            
+
             <div className="flex-1 max-w-md">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -206,9 +208,11 @@ const Customers: React.FC = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Team
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Billing
-                    </th>
+                    {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Billing
+                      </th>
+                    )}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
@@ -252,17 +256,19 @@ const Customers: React.FC = () => {
                           {customer.account_manager_name && `AM: ${customer.account_manager_name}`}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-2">
-                          <DollarSign className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-900">
-                            ${customer.billing_info?.hourly_rate || '0'}/hr
-                          </span>
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {customer.billing_info?.currency || 'USD'}
-                        </div>
-                      </td>
+                      {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center space-x-2">
+                            <DollarSign className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm text-gray-900">
+                              ${customer.billing_info?.hourly_rate || '0'}/hr
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {customer.billing_info?.currency || 'USD'}
+                          </div>
+                        </td>
+                      )}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -286,7 +292,7 @@ const Customers: React.FC = () => {
                             className="btn btn-sm btn-outline"
                             title="View Details"
                           >
-                            <Eye className="w-3 h-3" />
+                            <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => {
@@ -296,7 +302,7 @@ const Customers: React.FC = () => {
                             className="btn btn-sm btn-outline"
                             title="Edit Customer"
                           >
-                            <Edit className="w-3 h-3" />
+                            <Edit className="w-4 h-4" />
                           </button>
                           {customer.status !== 'archived' && (
                             <button
@@ -304,7 +310,7 @@ const Customers: React.FC = () => {
                               className="btn btn-sm btn-outline text-red-600 hover:text-red-700"
                               title="Archive Customer"
                             >
-                              <Archive className="w-3 h-3" />
+                              <Archive className="w-4 h-4" />
                             </button>
                           )}
                         </div>
@@ -363,17 +369,17 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   onCancel,
   isLoading,
 }) => {
+  const { user } = useAuthStore();
   const [formData, setFormData] = useState({
     name: customer?.name || '',
     contact_info: customer?.contact_info || {
       email: '',
       phone: '',
-      address: '',
+      contact_person: '',
     },
     billing_info: customer?.billing_info || {
       hourly_rate: 0,
       currency: 'USD',
-      payment_terms: 'Net 30',
     },
     assigned_user_ids: customer?.assigned_user_ids || [],
     account_manager_id: customer?.account_manager_id || '',
@@ -384,7 +390,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       toast.error('Customer name is required');
       return;
@@ -406,11 +412,19 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {customer ? 'Edit Customer' : 'Add New Customer'}
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {customer ? 'Edit Customer' : 'Add New Customer'}
+            </h3>
+            <button
+              onClick={onCancel}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          </div>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Basic Information */}
           <div>
@@ -475,73 +489,59 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               </div>
             </div>
             <div className="mt-4">
-              <label className="form-label">Address</label>
-              <textarea
-                value={formData.contact_info.address}
+              <label className="form-label">Contact Person</label>
+              <input
+                type="text"
+                value={formData.contact_info.contact_person}
                 onChange={(e) => setFormData({
                   ...formData,
-                                        contact_info: { ...formData.contact_info, address: e.target.value }
+                                        contact_info: { ...formData.contact_info, contact_person: e.target.value }
                 })}
-                className="form-textarea"
-                rows={3}
-                placeholder="Enter full address"
+                className="form-input"
+                placeholder="Enter contact person name"
               />
             </div>
           </div>
 
-          {/* Billing Information */}
-          <div>
-            <h4 className="text-md font-medium text-gray-900 mb-4">Billing Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="form-label">Hourly Rate</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.billing_info.hourly_rate}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                                          billing_info: { ...formData.billing_info, hourly_rate: parseFloat(e.target.value) || 0 }
-                  })}
-                  className="form-input"
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="form-label">Currency</label>
-                <select
-                  value={formData.billing_info.currency}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                                          billing_info: { ...formData.billing_info, currency: e.target.value }
-                  })}
-                  className="form-select"
-                >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                  <option value="CAD">CAD</option>
-                </select>
-              </div>
-              <div>
-                <label className="form-label">Payment Terms</label>
-                <select
-                  value={formData.billing_info.payment_terms}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                                          billing_info: { ...formData.billing_info, payment_terms: e.target.value }
-                  })}
-                  className="form-select"
-                >
-                  <option value="Net 15">Net 15</option>
-                  <option value="Net 30">Net 30</option>
-                  <option value="Net 45">Net 45</option>
-                  <option value="Net 60">Net 60</option>
-                </select>
+          {/* Billing Information - Admin and Account Manager only */}
+          {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
+            <div>
+              <h4 className="text-md font-medium text-gray-900 mb-4">Billing Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="form-label">Hourly Rate</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.billing_info.hourly_rate}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                                            billing_info: { ...formData.billing_info, hourly_rate: parseFloat(e.target.value) || 0 }
+                    })}
+                    className="form-input"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <label className="form-label">Currency</label>
+                  <select
+                    value={formData.billing_info.currency}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                                            billing_info: { ...formData.billing_info, currency: e.target.value }
+                    })}
+                    className="form-select"
+                  >
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                    <option value="CAD">CAD</option>
+                  </select>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Team Assignment */}
           <div>
@@ -574,7 +574,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 </select>
               </div>
             </div>
-            
+
             <div className="mt-4">
               <label className="form-label">Assigned Team Members</label>
               <div className="border rounded-lg p-4 max-h-40 overflow-y-auto">
@@ -644,9 +644,10 @@ interface CustomerDetailsProps {
 }
 
 const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onClose }) => {
-      const assignedUsers = users.filter(user => customer.assigned_user_ids?.includes(user.id));
-    const accountManager = users.find(user => user.id === customer.account_manager_id);
-    const leadingEngineer = users.find(user => user.id === customer.leading_engineer_id);
+  const { user } = useAuthStore();
+  const assignedUsers = users.filter(user => customer.assigned_user_ids?.includes(user.id));
+  const accountManager = users.find(user => user.id === customer.account_manager_id);
+  const leadingEngineer = users.find(user => user.id === customer.leading_engineer_id);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -664,7 +665,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onCl
             </button>
           </div>
         </div>
-        
+
         <div className="p-6 space-y-6">
           {/* Basic Information */}
           <div>
@@ -716,24 +717,20 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onCl
             )}
           </div>
 
-          {/* Billing Information */}
-          <div>
-            <h4 className="text-md font-medium text-gray-900 mb-4">Billing Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Hourly Rate</label>
-                <p className="text-sm text-gray-900 mt-1">
-                                          ${customer.billing_info?.hourly_rate || '0'} {customer.billing_info?.currency || 'USD'}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Payment Terms</label>
-                <p className="text-sm text-gray-900 mt-1">
-                                          {customer.billing_info?.payment_terms || 'Not set'}
-                </p>
+          {/* Billing Information - Admin and Account Manager only */}
+          {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
+            <div>
+              <h4 className="text-md font-medium text-gray-900 mb-4">Billing Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Hourly Rate</label>
+                  <p className="text-sm text-gray-900 mt-1">
+                                            ${customer.billing_info?.hourly_rate || '0'} {customer.billing_info?.currency || 'USD'}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Team Information */}
           <div>
@@ -752,7 +749,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onCl
                 </p>
               </div>
             </div>
-            
+
             <div className="mt-4">
               <label className="text-sm font-medium text-gray-700">Assigned Team Members</label>
               {assignedUsers.length === 0 ? (
@@ -792,4 +789,4 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onCl
   );
 };
 
-export default Customers; 
+export default Customers;

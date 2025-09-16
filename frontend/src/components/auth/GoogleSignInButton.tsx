@@ -21,26 +21,32 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
   const login = useGoogleLogin({
     onSuccess: async (response) => {
       try {
-        // Get the ID token from Google
-        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        console.log('Google OAuth response:', response);
+        console.log('API URL:', import.meta.env.VITE_API_URL);
+
+        // Send the authorization code to our backend to exchange for tokens
+        const tokenResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/google/exchange`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
           },
-          body: new URLSearchParams({
-            grant_type: 'authorization_code',
+          body: JSON.stringify({
             code: response.code,
-            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
             redirect_uri: window.location.origin,
           }),
         });
 
+        console.log('Token exchange response status:', tokenResponse.status);
+
         if (!tokenResponse.ok) {
-          throw new Error('Failed to exchange code for token');
+          const errorData = await tokenResponse.json();
+          console.error('Token exchange error:', errorData);
+          throw new Error(errorData.error || 'Failed to exchange code for token');
         }
 
         const tokenData = await tokenResponse.json();
-        
+        console.log('Token data received:', tokenData);
+
         if (!tokenData.id_token) {
           throw new Error('No ID token received from Google');
         }
@@ -49,6 +55,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         toast.success('Successfully signed in with Google!');
         onSuccess?.();
       } catch (error: any) {
+        console.error('Google OAuth error:', error);
         const errorMessage = error.message || 'Failed to sign in with Google';
         toast.error(errorMessage);
         onError?.(errorMessage);
@@ -93,4 +100,4 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
   );
 };
 
-export default GoogleSignInButton; 
+export default GoogleSignInButton;

@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
+const https = require('https');
 const db = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
 const { verifyGoogleToken, extractGoogleUserInfo } = require('../config/google');
@@ -18,8 +19,8 @@ const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 // Generate JWT token
 const generateToken = (userId, roles) => {
   return jwt.sign(
-    { 
-      userId, 
+    {
+      userId,
       roles,
       type: 'access'
     },
@@ -31,7 +32,7 @@ const generateToken = (userId, roles) => {
 // Generate refresh token
 const generateRefreshToken = (userId) => {
   return jwt.sign(
-    { 
+    {
       userId,
       type: 'refresh'
     },
@@ -72,7 +73,7 @@ router.post('/login', [
 
     // Verify password using password_hash field
     const isValidPassword = await bcrypt.compare(password, user.password_hash || '');
-    
+
     if (!isValidPassword) {
       return res.status(401).json({
         error: 'Invalid credentials',
@@ -133,7 +134,7 @@ router.post('/refresh', [
 
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, JWT_SECRET);
-    
+
     if (decoded.type !== 'refresh') {
       return res.status(401).json({
         error: 'Invalid refresh token',
@@ -170,11 +171,99 @@ router.post('/refresh', [
         code: 'INVALID_REFRESH_TOKEN'
       });
     }
-    
+
     console.error('Token refresh error:', error);
     res.status(500).json({
       error: 'Token refresh failed',
       code: 'REFRESH_ERROR'
+    });
+  }
+});
+
+// Google OAuth token exchange endpoint
+router.post('/google/exchange', [
+  body('code').notEmpty(),
+  body('redirect_uri').notEmpty(),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: 'Validation error',
+        code: 'VALIDATION_ERROR',
+        details: errors.array()
+      });
+    }
+
+    const { code, redirect_uri } = req.body;
+
+    // Exchange authorization code for tokens using https module
+    const postData = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: redirect_uri,
+    }).toString();
+
+    const tokenData = await new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'oauth2.googleapis.com',
+        port: 443,
+        path: '/token',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          try {
+            const parsedData = JSON.parse(data);
+            if (res.statusCode >= 400) {
+              console.error('Google token exchange failed:', parsedData);
+              reject(new Error(parsedData.error || 'Token exchange failed'));
+            } else {
+              resolve(parsedData);
+            }
+          } catch (error) {
+            reject(new Error('Failed to parse token response'));
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        reject(error);
+      });
+
+      req.write(postData);
+      req.end();
+    });
+
+    if (!tokenData.id_token) {
+      return res.status(400).json({
+        error: 'No ID token received from Google',
+        code: 'NO_ID_TOKEN'
+      });
+    }
+
+    res.json({
+      id_token: tokenData.id_token,
+      access_token: tokenData.access_token,
+      expires_in: tokenData.expires_in
+    });
+
+  } catch (error) {
+    console.error('Google token exchange error:', error);
+    res.status(500).json({
+      error: 'Token exchange failed',
+      code: 'TOKEN_EXCHANGE_ERROR'
     });
   }
 });
@@ -247,7 +336,7 @@ router.post('/google', [
     // Update last login and avatar
     await db('users')
       .where({ id: user.id })
-      .update({ 
+      .update({
         last_login_at: new Date(),
         avatar_url: googleUser.picture,
         name: googleUser.name // Update name in case it changed
@@ -321,4 +410,4 @@ router.get('/profile', authenticateToken, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

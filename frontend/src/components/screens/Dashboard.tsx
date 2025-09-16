@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
-import { reportsApi } from '../../services/api';
+import { reportsApi, customersApi } from '../../services/api';
 import {
   Clock,
   DollarSign,
@@ -11,14 +12,17 @@ import {
   ArrowDown,
   Filter,
 } from 'lucide-react';
-import { DashboardData } from '../../types';
+import { DashboardData, TimeEntryFormData } from '../../types';
 import LoadingSpinner from '../common/LoadingSpinner';
+import TimeEntryForm from '../common/TimeEntryForm';
 import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('current');
+  const [showLogTimeModal, setShowLogTimeModal] = useState(false);
   const currentMonth = new Date();
-  
+  const navigate = useNavigate();
+
   const getDateRange = (period: string) => {
     switch (period) {
       case 'current':
@@ -65,6 +69,12 @@ const Dashboard: React.FC = () => {
     refetchOnWindowFocus: false,
   });
 
+  // Fetch customers for the time entry form
+  const { data: customersData } = useQuery({
+    queryKey: ['customers'],
+    queryFn: () => customersApi.getCustomers(),
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-64">
@@ -99,12 +109,20 @@ const Dashboard: React.FC = () => {
     name: stat.status,
     value: stat.count,
     hours: stat.hours,
-    color: stat.status === 'approved' ? '#10b981' : 
-           stat.status === 'submitted' ? '#f59e0b' : 
+    color: stat.status === 'approved' ? '#10b981' :
+           stat.status === 'submitted' ? '#f59e0b' :
            stat.status === 'draft' ? '#6b7280' : '#ef4444',
   })) || [];
 
   const maxHours = Math.max(...monthlyChartData.map(d => safeNumber(d.hours)), 1);
+
+  // Handle time entry form submission
+  const handleTimeEntrySubmit = (data: TimeEntryFormData) => {
+    // TODO: Implement API call to create time entry
+    console.log('Time entry submitted:', data);
+    toast.success('Time entry logged successfully!');
+    setShowLogTimeModal(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -127,6 +145,31 @@ const Dashboard: React.FC = () => {
             <option value="previous">Previous Month</option>
             <option value="last3months">Last 3 Months</option>
           </select>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+        </div>
+        <div className="card-body">
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setShowLogTimeModal(true)}
+              className="btn btn-primary flex items-center space-x-2"
+            >
+              <Clock className="w-4 h-4" />
+              <span>Log Time</span>
+            </button>
+            <button
+              onClick={() => navigate('/reports')}
+              className="btn btn-outline flex items-center space-x-2"
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span>View Reports</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -250,8 +293,8 @@ const Dashboard: React.FC = () => {
               {statusChartData.map((stat, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div 
-                      className="w-4 h-4 rounded-full" 
+                    <div
+                      className="w-4 h-4 rounded-full"
                       style={{ backgroundColor: stat.color }}
                     />
                     <span className="text-sm font-medium text-gray-700 capitalize">
@@ -279,7 +322,7 @@ const Dashboard: React.FC = () => {
             {topCustomers.map((customer, index) => {
               const maxCustomerHours = Math.max(...topCustomers.map(c => safeNumber(c.totalHours)), 1);
               const percentage = (safeNumber(customer.totalHours) / maxCustomerHours) * 100;
-              
+
               return (
                 <div key={customer.id} className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -358,26 +401,31 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
-        </div>
-        <div className="card-body">
-          <div className="grid grid-cols-2 gap-4">
-            <button className="btn btn-primary flex items-center space-x-2">
-              <Clock className="w-4 h-4" />
-              <span>Log Time</span>
-            </button>
-            <button className="btn btn-outline flex items-center space-x-2">
-              <BarChart3 className="w-4 h-4" />
-              <span>View Reports</span>
-            </button>
+      {/* Log Time Modal */}
+      {showLogTimeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Log Time Entry</h2>
+              <button
+                onClick={() => setShowLogTimeModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            <TimeEntryForm
+              customers={customersData?.customers || []}
+              onSubmit={handleTimeEntrySubmit}
+              onCancel={() => setShowLogTimeModal(false)}
+            />
           </div>
         </div>
-      </div>
+      )}
+
     </div>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
