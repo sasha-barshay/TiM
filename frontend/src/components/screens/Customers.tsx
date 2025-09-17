@@ -381,19 +381,19 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   const { user } = useAuthStore();
   const [formData, setFormData] = useState({
     name: customer?.name || '',
-    contact_info: customer?.contact_info || {
+    contactInfo: customer?.contact_info || {
       email: '',
       phone: '',
       contact_person: '',
     },
-    billing_info: customer?.billing_info || {
+    billingInfo: customer?.billing_info || {
       hourly_rate: 0,
       currency: 'USD',
     },
-    assigned_user_ids: customer?.assigned_user_ids || [],
-    account_manager_id: customer?.account_manager_id || '',
-    leading_engineer_id: customer?.leading_engineer_id || '',
-    working_schedule_id: customer?.working_schedule_id || '',
+    assignedUserIds: customer?.assigned_user_ids || [],
+    accountManagerId: customer?.account_manager_id || '',
+    leadingEngineerId: customer?.leading_engineer_id || '',
+    workingScheduleId: customer?.working_schedule_id || '',
     status: customer?.status || 'active',
   });
 
@@ -411,9 +411,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   const handleUserToggle = (userId: string) => {
     setFormData(prev => ({
       ...prev,
-      assigned_user_ids: prev.assigned_user_ids.includes(userId)
-        ? prev.assigned_user_ids.filter(id => id !== userId)
-        : [...prev.assigned_user_ids, userId]
+      assignedUserIds: prev.assignedUserIds.includes(userId)
+        ? prev.assignedUserIds.filter(id => id !== userId)
+        : [...prev.assignedUserIds, userId]
     }));
   };
 
@@ -474,10 +474,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 <label className="form-label">Email</label>
                 <input
                   type="email"
-                  value={formData.contact_info.email}
+                  value={formData.contactInfo.email}
                   onChange={(e) => setFormData({
                     ...formData,
-                                          contact_info: { ...formData.contact_info, email: e.target.value }
+                    contactInfo: { ...formData.contactInfo, email: e.target.value }
                   })}
                   className="form-input"
                   placeholder="customer@example.com"
@@ -487,10 +487,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 <label className="form-label">Phone</label>
                 <input
                   type="tel"
-                  value={formData.contact_info.phone}
+                  value={formData.contactInfo.phone}
                   onChange={(e) => setFormData({
                     ...formData,
-                                          contact_info: { ...formData.contact_info, phone: e.target.value }
+                    contactInfo: { ...formData.contactInfo, phone: e.target.value }
                   })}
                   className="form-input"
                   placeholder="+1 (555) 123-4567"
@@ -501,10 +501,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <label className="form-label">Contact Person</label>
               <input
                 type="text"
-                value={formData.contact_info.contact_person}
+                value={formData.contactInfo.contact_person}
                 onChange={(e) => setFormData({
                   ...formData,
-                                        contact_info: { ...formData.contact_info, contact_person: e.target.value }
+                  contactInfo: { ...formData.contactInfo, contact_person: e.target.value }
                 })}
                 className="form-input"
                 placeholder="Enter contact person name"
@@ -523,10 +523,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                     type="number"
                     step="0.01"
                     min="0"
-                    value={formData.billing_info.hourly_rate}
+                    value={formData.billingInfo.hourly_rate}
                     onChange={(e) => setFormData({
                       ...formData,
-                                            billing_info: { ...formData.billing_info, hourly_rate: parseFloat(e.target.value) || 0 }
+                      billingInfo: { ...formData.billingInfo, hourly_rate: parseFloat(e.target.value) || 0 }
                     })}
                     className="form-input"
                     placeholder="0.00"
@@ -535,10 +535,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 <div>
                   <label className="form-label">Currency</label>
                   <select
-                    value={formData.billing_info.currency}
+                    value={formData.billingInfo.currency}
                     onChange={(e) => setFormData({
                       ...formData,
-                                            billing_info: { ...formData.billing_info, currency: e.target.value }
+                      billingInfo: { ...formData.billingInfo, currency: e.target.value }
                     })}
                     className="form-select"
                   >
@@ -559,8 +559,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <div>
                 <label className="form-label">Account Manager</label>
                 <select
-                  value={formData.account_manager_id}
-                                      onChange={(e) => setFormData({ ...formData, account_manager_id: e.target.value })}
+                  value={formData.accountManagerId}
+                  onChange={(e) => setFormData({ ...formData, accountManagerId: e.target.value })}
                   className="form-select"
                 >
                   <option value="">Select Account Manager</option>
@@ -572,8 +572,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <div>
                 <label className="form-label">Leading Engineer</label>
                 <select
-                  value={formData.leading_engineer_id}
-                                      onChange={(e) => setFormData({ ...formData, leading_engineer_id: e.target.value })}
+                  value={formData.leadingEngineerId}
+                  onChange={(e) => setFormData({ ...formData, leadingEngineerId: e.target.value })}
                   className="form-select"
                 >
                   <option value="">Select Leading Engineer</option>
@@ -595,7 +595,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                       <label key={user.id} className="flex items-center space-x-3">
                         <input
                           type="checkbox"
-                          checked={formData.assigned_user_ids.includes(user.id)}
+                          checked={formData.assignedUserIds.includes(user.id)}
                           onChange={() => handleUserToggle(user.id)}
                           className="form-checkbox"
                         />
