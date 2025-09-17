@@ -104,7 +104,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* User section */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200">
+        <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="flex items-center space-x-3 mb-4">
             {user?.avatarUrl ? (
               <img
