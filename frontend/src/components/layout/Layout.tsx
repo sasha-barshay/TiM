@@ -67,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg">
+      <aside className="w-64 bg-white shadow-lg flex flex-col">
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-8">
             <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
@@ -104,7 +104,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* User section */}
-        <div className="absolute bottom-0 left-0 right-0 p-6">
+        <div className="mt-auto p-6">
           <div className="flex items-center space-x-3 mb-4">
             {user?.avatarUrl ? (
               <img
@@ -125,7 +125,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+            className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-colors duration-200"
           >
             <LogOut className="w-4 h-4" />
             <span className="text-sm">Logout</span>
