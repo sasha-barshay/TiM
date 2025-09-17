@@ -15,7 +15,7 @@ const reportRoutes = require('./routes/reports');
 const workingScheduleRoutes = require('./routes/workingSchedules');
 
 // Import middleware
-const { authenticateToken } = require('./middleware/auth');
+const { authenticateToken, requireCustomerAssignment } = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -62,14 +62,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  
+
   next();
 });
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0'
   });
@@ -78,14 +78,14 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
-app.use('/api/customers', authenticateToken, customerRoutes);
-app.use('/api/time-entries', authenticateToken, timeEntryRoutes);
-app.use('/api/reports', authenticateToken, reportRoutes);
-app.use('/api/working-schedules', authenticateToken, workingScheduleRoutes);
+app.use('/api/customers', authenticateToken, requireCustomerAssignment, customerRoutes);
+app.use('/api/time-entries', authenticateToken, requireCustomerAssignment, timeEntryRoutes);
+app.use('/api/reports', authenticateToken, requireCustomerAssignment, reportRoutes);
+app.use('/api/working-schedules', authenticateToken, requireCustomerAssignment, workingScheduleRoutes);
 
 // Mobile-specific endpoints
 app.get('/api/sync/status', authenticateToken, (req, res) => {
-  res.json({ 
+  res.json({
     status: 'synced',
     lastSync: new Date().toISOString(),
     pendingChanges: 0
@@ -104,7 +104,7 @@ app.use('*', (req, res) => {
 // Global error handler
 app.use((error, req, res, next) => {
   console.error('Global error handler:', error);
-  
+
   // Handle validation errors
   if (error.name === 'ValidationError') {
     return res.status(400).json({
@@ -140,12 +140,12 @@ app.use((error, req, res, next) => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  
+
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  
+
   process.exit(0);
 });
 
@@ -156,4 +156,4 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-module.exports = app; 
+module.exports = app;

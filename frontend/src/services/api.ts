@@ -42,12 +42,13 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor to handle token refresh and access control
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    // Handle 401 errors (token refresh)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -61,6 +62,16 @@ api.interceptors.response.use(
       } catch (refreshError) {
         useAuthStore.getState().logout();
         return Promise.reject(refreshError);
+      }
+    }
+
+    // Handle 403 errors with specific access control messages
+    if (error.response?.status === 403) {
+      const errorData = error.response.data;
+      if (errorData?.code === 'NO_CUSTOMERS_ASSIGNED') {
+        // Don't reject the promise, let the component handle this specific error
+        error.isAccessControlError = true;
+        error.accessControlMessage = errorData.error;
       }
     }
 

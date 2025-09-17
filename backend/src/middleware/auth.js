@@ -24,7 +24,7 @@ const authenticateToken = async (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Access token required',
         code: 'TOKEN_MISSING'
       });
@@ -32,14 +32,14 @@ const authenticateToken = async (req, res, next) => {
 
     // Verify JWT token
     const decoded = jwt.verify(token, JWT_SECRET);
-    
+
     // Get user from database
     const user = await db('users')
       .where({ id: decoded.userId, is_active: true })
       .first();
 
     if (!user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Invalid or expired token',
         code: 'TOKEN_INVALID'
       });
@@ -50,20 +50,20 @@ const authenticateToken = async (req, res, next) => {
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Invalid token',
         code: 'TOKEN_INVALID'
       });
     }
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Token expired',
         code: 'TOKEN_EXPIRED'
       });
     }
-    
+
     console.error('Auth middleware error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Authentication error',
       code: 'AUTH_ERROR'
     });
@@ -74,19 +74,19 @@ const authenticateToken = async (req, res, next) => {
 const requireRole = (roles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Authentication required',
         code: 'AUTH_REQUIRED'
       });
     }
 
     const userRoles = req.user.roles || [];
-    const hasRole = Array.isArray(roles) 
+    const hasRole = Array.isArray(roles)
       ? roles.some(role => userRoles.includes(role))
       : userRoles.includes(roles);
 
     if (!hasRole) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Insufficient permissions',
         code: 'INSUFFICIENT_PERMISSIONS'
       });
@@ -123,7 +123,7 @@ const requireCustomerAccess = async (req, res, next) => {
       .first();
 
     if (!customer) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Customer not found',
         code: 'CUSTOMER_NOT_FOUND'
       });
@@ -131,7 +131,7 @@ const requireCustomerAccess = async (req, res, next) => {
 
     const assignedUsers = customer.assigned_user_ids || [];
     if (!assignedUsers.includes(userId)) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Access denied to this customer',
         code: 'CUSTOMER_ACCESS_DENIED'
       });
@@ -140,7 +140,7 @@ const requireCustomerAccess = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Customer access check error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Access check error',
       code: 'ACCESS_CHECK_ERROR'
     });
@@ -167,7 +167,7 @@ const requireTimeEntryAccess = async (req, res, next) => {
       .first();
 
     if (!timeEntry) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Time entry not found',
         code: 'TIME_ENTRY_NOT_FOUND'
       });
@@ -186,13 +186,50 @@ const requireTimeEntryAccess = async (req, res, next) => {
       }
     }
 
-    return res.status(403).json({ 
+    return res.status(403).json({
       error: 'Access denied to this time entry',
       code: 'TIME_ENTRY_ACCESS_DENIED'
     });
   } catch (error) {
     console.error('Time entry access check error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
+      error: 'Access check error',
+      code: 'ACCESS_CHECK_ERROR'
+    });
+  }
+};
+
+// Check if user has assigned customers (required for app access)
+const requireCustomerAssignment = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const userRoles = req.user.roles || [];
+
+    // Admins and account managers can access the app without customer assignment
+    if (userRoles.includes('admin') || userRoles.includes('account_manager')) {
+      return next();
+    }
+
+    // Check if user is assigned to any customers
+    const assignedCustomers = await db('customers')
+      .whereRaw('? = ANY(assigned_user_ids)', [userId])
+      .where('status', 'active')
+      .count('* as count')
+      .first();
+
+    const customerCount = parseInt(assignedCustomers.count);
+
+    if (customerCount === 0) {
+      return res.status(403).json({
+        error: 'No customers assigned. Please contact your administrator.',
+        code: 'NO_CUSTOMERS_ASSIGNED'
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error('Customer assignment check error:', error);
+    return res.status(500).json({
       error: 'Access check error',
       code: 'ACCESS_CHECK_ERROR'
     });
@@ -207,4 +244,5 @@ module.exports = {
   requireEngineer,
   requireCustomerAccess,
   requireTimeEntryAccess,
-}; 
+  requireCustomerAssignment,
+};

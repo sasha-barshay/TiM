@@ -15,6 +15,7 @@ import {
 import { DashboardData, TimeEntryFormData } from '../../types';
 import LoadingSpinner from '../common/LoadingSpinner';
 import TimeEntryForm from '../common/TimeEntryForm';
+import AccessControlError from '../common/AccessControlError';
 import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
@@ -70,7 +71,7 @@ const Dashboard: React.FC = () => {
   });
 
   // Fetch customers for the time entry form
-  const { data: customersData } = useQuery({
+  const { data: customersData, error: customersError } = useQuery({
     queryKey: ['customers'],
     queryFn: () => customersApi.getCustomers(),
   });
@@ -80,6 +81,17 @@ const Dashboard: React.FC = () => {
       <div className="flex items-center justify-center min-h-64">
         <LoadingSpinner size="lg" text="Loading dashboard..." />
       </div>
+    );
+  }
+
+  // Handle access control errors
+  if (customersError && (customersError as any).isAccessControlError) {
+    const accessError = customersError as any;
+    return (
+      <AccessControlError
+        message={accessError.accessControlMessage}
+        code={accessError.response?.data?.code || 'ACCESS_DENIED'}
+      />
     );
   }
 
