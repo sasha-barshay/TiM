@@ -25,7 +25,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         console.log('API URL:', import.meta.env.VITE_API_URL);
 
         // Send the authorization code to our backend to exchange for tokens
-        const tokenResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/google/exchange`, {
+        const tokenResponse = await fetch(`${import.meta.env.VITE_API_URL}/auth/google/exchange`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
