@@ -135,13 +135,16 @@ const Customers: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
           <p className="text-gray-600">Manage your clients and projects</p>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="btn btn-primary flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Customer</span>
-        </button>
+        {/* Only account managers and admins can add customers */}
+        {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
+          <button
+            onClick={() => setShowForm(true)}
+            className="btn btn-primary flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Customer</span>
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -294,24 +297,29 @@ const Customers: React.FC = () => {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button
-                            onClick={() => {
-                              setSelectedCustomer(customer);
-                              setShowForm(true);
-                            }}
-                            className="btn btn-sm btn-outline"
-                            title="Edit Customer"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          {customer.status !== 'archived' && (
-                            <button
-                              onClick={() => handleArchive(customer)}
-                              className="btn btn-sm btn-outline text-red-600 hover:text-red-700"
-                              title="Archive Customer"
-                            >
-                              <Archive className="w-4 h-4" />
-                            </button>
+                          {/* Only account managers and admins can edit/archive customers */}
+                          {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setSelectedCustomer(customer);
+                                  setShowForm(true);
+                                }}
+                                className="btn btn-sm btn-outline"
+                                title="Edit Customer"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              {customer.status !== 'archived' && (
+                                <button
+                                  onClick={() => handleArchive(customer)}
+                                  className="btn btn-sm btn-outline text-red-600 hover:text-red-700"
+                                  title="Archive Customer"
+                                >
+                                  <Archive className="w-4 h-4" />
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>
