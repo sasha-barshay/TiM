@@ -405,7 +405,15 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
       return;
     }
 
-    onSubmit(formData);
+    // Convert empty strings to null for optional UUID fields
+    const submitData = {
+      ...formData,
+      accountManagerId: formData.accountManagerId || null,
+      leadingEngineerId: formData.leadingEngineerId || null,
+      workingScheduleId: formData.workingScheduleId || null,
+    };
+
+    onSubmit(submitData);
   };
 
   const handleUserToggle = (userId: string) => {

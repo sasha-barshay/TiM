@@ -132,9 +132,18 @@ router.post('/', [
   body('contactInfo').optional().isObject().withMessage('Contact info must be an object'),
   body('billingInfo').optional().isObject().withMessage('Billing info must be an object'),
   body('assignedUserIds').optional().isArray().withMessage('Assigned user IDs must be an array'),
-  body('accountManagerId').optional().isUUID().withMessage('Invalid account manager ID'),
-  body('leadingEngineerId').optional().isUUID().withMessage('Invalid leading engineer ID'),
-  body('workingScheduleId').optional().isUUID().withMessage('Invalid working schedule ID'),
+  body('accountManagerId').optional().custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  }).withMessage('Invalid account manager ID'),
+  body('leadingEngineerId').optional().custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  }).withMessage('Invalid leading engineer ID'),
+  body('workingScheduleId').optional().custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  }).withMessage('Invalid working schedule ID'),
   body('status').optional().isIn(['active', 'inactive', 'archived']).withMessage('Invalid status'),
 ], requireAccountManager, async (req, res) => {
   try {
@@ -209,9 +218,18 @@ router.put('/:customerId', [
   body('contactInfo').optional().isObject().withMessage('Contact info must be an object'),
   body('billingInfo').optional().isObject().withMessage('Billing info must be an object'),
   body('assignedUserIds').optional().isArray().withMessage('Assigned user IDs must be an array'),
-  body('accountManagerId').optional().isUUID().withMessage('Invalid account manager ID'),
-  body('leadingEngineerId').optional().isUUID().withMessage('Invalid leading engineer ID'),
-  body('workingScheduleId').optional().isUUID().withMessage('Invalid working schedule ID'),
+  body('accountManagerId').optional().custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  }).withMessage('Invalid account manager ID'),
+  body('leadingEngineerId').optional().custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  }).withMessage('Invalid leading engineer ID'),
+  body('workingScheduleId').optional().custom((value) => {
+    if (value === null || value === undefined || value === '') return true;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  }).withMessage('Invalid working schedule ID'),
   body('status').optional().isIn(['active', 'inactive', 'archived']).withMessage('Invalid status'),
 ], requireCustomerAccess, requireAccountManager, async (req, res) => {
   try {
