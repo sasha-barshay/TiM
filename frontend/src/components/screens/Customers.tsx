@@ -42,10 +42,11 @@ const Customers: React.FC = () => {
     },
   });
 
-  // Fetch users for assignment
+  // Fetch users for assignment (only for admins and account managers)
   const { data: usersData, isLoading: usersLoading } = useQuery({
     queryKey: ['users'],
     queryFn: () => usersApi.getUsers(),
+    enabled: user?.roles.includes('admin') || user?.roles.includes('account_manager'),
   });
 
   // Create customer mutation
@@ -88,7 +89,7 @@ const Customers: React.FC = () => {
     },
   });
 
-  if (customersLoading || usersLoading) {
+  if (customersLoading || (usersLoading && (user?.roles.includes('admin') || user?.roles.includes('account_manager')))) {
     return (
       <div className="flex items-center justify-center min-h-64">
         <LoadingSpinner size="lg" text="Loading customers..." />
@@ -332,8 +333,8 @@ const Customers: React.FC = () => {
         </div>
       </div>
 
-      {/* Customer Form Modal */}
-      {showForm && (
+      {/* Customer Form Modal - Only show for admins and account managers */}
+      {showForm && (user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
         <CustomerForm
           customer={selectedCustomer}
           users={users}
@@ -563,7 +564,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                   className="form-select"
                 >
                   <option value="">Select Account Manager</option>
-                  {users.filter(user => user.roles.includes('account_manager')).map(user => (
+                  {users?.filter(user => user.roles.includes('account_manager')).map(user => (
                     <option key={user.id} value={user.id}>{user.name}</option>
                   ))}
                 </select>
@@ -576,7 +577,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                   className="form-select"
                 >
                   <option value="">Select Leading Engineer</option>
-                  {users.filter(user => user.roles.includes('engineer')).map(user => (
+                  {users?.filter(user => user.roles.includes('engineer')).map(user => (
                     <option key={user.id} value={user.id}>{user.name}</option>
                   ))}
                 </select>
@@ -586,7 +587,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
             <div className="mt-4">
               <label className="form-label">Assigned Team Members</label>
               <div className="border rounded-lg p-4 max-h-40 overflow-y-auto">
-                {users.length === 0 ? (
+                {!users || users.length === 0 ? (
                   <p className="text-gray-500 text-sm">No users available</p>
                 ) : (
                   <div className="space-y-2">
@@ -653,9 +654,9 @@ interface CustomerDetailsProps {
 
 const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onClose }) => {
   const { user } = useAuthStore();
-  const assignedUsers = users.filter(user => customer.assigned_user_ids?.includes(user.id));
-  const accountManager = users.find(user => user.id === customer.account_manager_id);
-  const leadingEngineer = users.find(user => user.id === customer.leading_engineer_id);
+  const assignedUsers = users?.filter(user => customer.assigned_user_ids?.includes(user.id)) || [];
+  const accountManager = users?.find(user => user.id === customer.account_manager_id);
+  const leadingEngineer = users?.find(user => user.id === customer.leading_engineer_id);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
