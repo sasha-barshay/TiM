@@ -135,7 +135,7 @@ router.post('/', [
       .insert({
         name,
         contact_info: contactInfo,
-        billing_info: billingInfo,
+: billingInfo,
         assigned_user_ids: assignedUserIds,
         account_manager_id: accountManagerId,
         leading_engineer_id: leadingEngineerId,
@@ -194,7 +194,7 @@ router.put('/:customerId', [
       .update({
         name: updateData.name,
         contact_info: updateData.contactInfo,
-        billing_info: updateData.billingInfo,
+: updateData.billingInfo,
         status: updateData.status,
         updated_at: new Date()
       })

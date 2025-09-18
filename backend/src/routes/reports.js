@@ -48,11 +48,9 @@ router.get('/dashboard', [
     // Get total hours and earnings
     const result = await baseQuery.clone()
       .select(
-        db.raw('COALESCE(SUM(te.hours), 0) as total_hours'),
-        db.raw('COALESCE(SUM(te.hours * COALESCE((c.billing_info->>\'hourly_rate\')::numeric, 0)), 0) as total_earnings')
+        db.raw('COALESCE(SUM(te.hours), 0) as total_hours')
       );
     const totalHours = result[0]?.total_hours || 0;
-    const totalEarnings = result[0]?.total_earnings || 0;
 
     // Get time entries by status
     const statusStats = await baseQuery.clone()
@@ -111,7 +109,6 @@ router.get('/dashboard', [
         },
         summary: {
           totalHours: parseFloat(totalHours || 0),
-          totalEarnings: parseFloat(totalEarnings || 0),
           totalEntries: recentEntries.length
         },
         statusStats,
@@ -156,14 +153,14 @@ router.get('/time-entries', [
 
     const userId = req.user.id;
     const userRoles = req.user.roles || [];
-    const { 
-      startDate, 
-      endDate, 
-      customerId, 
-      userId: filterUserId, 
-      status, 
-      limit = 100, 
-      offset = 0 
+    const {
+      startDate,
+      endDate,
+      customerId,
+      userId: filterUserId,
+      status,
+      limit = 100,
+      offset = 0
     } = req.query;
 
     // Build query
@@ -230,16 +227,11 @@ router.get('/time-entries', [
 
     // Calculate summary
     const totalHours = timeEntries.reduce((sum, entry) => sum + parseFloat(entry.hours), 0);
-    const totalEarnings = timeEntries.reduce((sum, entry) => {
-      const hourlyRate = entry.billing_info?.hourly_rate || 0;
-      return sum + (parseFloat(entry.hours) * parseFloat(hourlyRate));
-    }, 0);
 
     res.json({
       timeEntries,
       summary: {
         totalHours,
-        totalEarnings,
         totalEntries: timeEntries.length,
         totalCount: parseInt(count)
       },
@@ -300,8 +292,6 @@ router.get('/time-entries/export', [
         'te.status',
         'c.name as customer_name',
         'u.name as user_name',
-        db.raw('COALESCE(c.billing_info->>\'hourly_rate\', \'0\') as hourly_rate'),
-        db.raw('te.hours * COALESCE(c.billing_info->>\'hourly_rate\', \'0\')::numeric as earnings')
       );
 
     // Filter by user permissions
@@ -325,12 +315,10 @@ router.get('/time-entries/export', [
     const csvHeaders = [
       'Date',
       'User',
-      'Customer',
-      'Hours',
-      'Hourly Rate',
-      'Earnings',
-      'Description',
-      'Status'
+    'Customer',
+    'Hours',
+    'Description',
+    'Status'
     ];
 
     const csvRows = timeEntries.map(entry => [
@@ -338,8 +326,6 @@ router.get('/time-entries/export', [
       entry.user_name,
       entry.customer_name,
       entry.hours,
-      entry.hourly_rate,
-      entry.earnings,
       `"${(entry.description || '').replace(/"/g, '""')}"`,
       entry.status
     ]);
@@ -350,7 +336,7 @@ router.get('/time-entries/export', [
 
     // Set response headers for CSV download
     const filename = `time-entries-${new Date().toISOString().split('T')[0]}.csv`;
-    
+
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(csvContent);
@@ -411,10 +397,6 @@ router.get('/customers/:customerId', [
 
     // Calculate statistics
     const totalHours = timeEntries.reduce((sum, entry) => sum + parseFloat(entry.hours), 0);
-    const totalEarnings = timeEntries.reduce((sum, entry) => {
-      const hourlyRate = customer.billing_info?.hourly_rate || 0;
-      return sum + (parseFloat(entry.hours) * parseFloat(hourlyRate));
-    }, 0);
 
     // Group by user
     const userStats = timeEntries.reduce((acc, entry) => {
@@ -450,21 +432,18 @@ router.get('/customers/:customerId', [
         acc[month] = {
           month,
           totalHours: 0,
-          totalEntries: 0,
-          totalEarnings: 0
+          totalEntries: 0
         };
       }
       acc[month].totalHours += parseFloat(entry.hours);
       acc[month].totalEntries += 1;
-      acc[month].totalEarnings += parseFloat(entry.hours) * parseFloat(customer.billing_info?.hourly_rate || 0);
       return acc;
     }, {});
 
     res.json({
       customer: {
         id: customer.id,
-        name: customer.name,
-        billingInfo: customer.billing_info
+        name: customer.name
       },
       period: {
         startDate,
@@ -472,7 +451,6 @@ router.get('/customers/:customerId', [
       },
       summary: {
         totalHours,
-        totalEarnings,
         totalEntries: timeEntries.length,
         averageHoursPerEntry: timeEntries.length > 0 ? totalHours / timeEntries.length : 0
       },
@@ -491,4 +469,4 @@ router.get('/customers/:customerId', [
   }
 });
 
-module.exports = router; 
+module.exports = router;

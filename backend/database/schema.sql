@@ -35,7 +35,6 @@ CREATE TABLE customers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     contact_info JSONB, -- email, phone, address
-    billing_info JSONB, -- hourly_rate, currency, payment_terms
     assigned_user_ids UUID[] DEFAULT '{}', -- Array of user IDs with access
     account_manager_id UUID REFERENCES users(id),
     leading_engineer_id UUID REFERENCES users(id),
@@ -127,4 +126,4 @@ ALTER TABLE invitations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies (will be implemented in application layer for now)
--- These will be set up based on user roles and permissions 
+-- These will be set up based on user roles and permissions

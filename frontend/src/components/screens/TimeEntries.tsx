@@ -51,7 +51,7 @@ const TimeEntries: React.FC = () => {
     onError: (error: any) => {
       const errorMessage = error.response?.data?.error || error.message || 'Failed to create time entry';
       const errorDetails = error.response?.data?.details;
-      
+
       if (errorDetails && Array.isArray(errorDetails)) {
         const detailMessages = errorDetails.map((detail: any) => detail.msg).join(', ');
         toast.error(`${errorMessage}: ${detailMessages}`);
@@ -74,7 +74,7 @@ const TimeEntries: React.FC = () => {
     onError: (error: any) => {
       const errorMessage = error.response?.data?.error || error.message || 'Failed to update time entry';
       const errorDetails = error.response?.data?.details;
-      
+
       if (errorDetails && Array.isArray(errorDetails)) {
         const detailMessages = errorDetails.map((detail: any) => detail.msg).join(', ');
         toast.error(`${errorMessage}: ${detailMessages}`);

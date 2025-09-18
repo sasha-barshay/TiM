@@ -84,7 +84,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {filteredNavigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
-              
+
               return (
                 <button
                   key={item.path}
@@ -122,7 +122,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <p className="text-xs text-gray-500 truncate">{user?.email}</p>
             </div>
           </div>
-          
+
           <button
             onClick={handleLogout}
             className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-colors duration-200"
@@ -143,4 +143,4 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 };
 
-export default Layout; 
+export default Layout;

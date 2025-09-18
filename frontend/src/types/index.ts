@@ -54,11 +54,6 @@ export interface Customer {
     phone?: string;
     address?: string;
   };
-  billing_info?: {
-    hourly_rate?: number;
-    currency?: string;
-    payment_terms?: string;
-  };
   assigned_user_ids: string[];
   account_manager_id?: string;
   leading_engineer_id?: string;
@@ -265,11 +260,6 @@ export interface CustomerFormData {
     phone?: string;
     address?: string;
   };
-  billing_info?: {
-    hourly_rate?: number;
-    currency?: string;
-    payment_terms?: string;
-  };
   assigned_user_ids: string[];
   account_manager_id?: string;
   leading_engineer_id?: string;
@@ -338,4 +328,4 @@ export interface TimeSeriesData {
   hours: number;
   entries: number;
   earnings: number;
-} 
+}

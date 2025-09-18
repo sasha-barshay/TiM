@@ -84,47 +84,47 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation: Ensure minimum requirements
     if (!formData.customerId) {
       toast.error('Please select a customer');
       return;
     }
-    
+
     if (!formData.description.trim()) {
       toast.error('Please enter a description');
       return;
     }
-    
+
     if (formData.hours < 0.5) {
       toast.error('Minimum 0.5 hours required');
       return;
     }
-    
+
     // If start/end times are provided, ensure both are present
     if (formData.startTime && !formData.endTime) {
       toast.error('Please provide both start and end times');
       return;
     }
-    
+
     if (formData.endTime && !formData.startTime) {
       toast.error('Please provide both start and end times');
       return;
     }
-    
+
     // Format times to HH:MM format (remove seconds if present)
     const formatTimeForAPI = (time: string) => {
       if (!time) return time;
       // If time includes seconds (HH:MM:SS), remove them
       return time.length > 5 ? time.slice(0, 5) : time;
     };
-    
+
     const formattedData = {
       ...formData,
       startTime: formatTimeForAPI(formData.startTime || ''),
       endTime: formatTimeForAPI(formData.endTime || '')
     };
-    
+
     onSubmit(formattedData);
   };
 

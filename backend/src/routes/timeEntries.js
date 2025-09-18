@@ -21,17 +21,17 @@ const timeEntryValidation = [
 // Helper function to calculate hours from start/end times
 const calculateHours = (date, startTime, endTime) => {
   if (!startTime || !endTime) return null;
-  
+
   const startDateTime = new Date(`${date}T${startTime}`);
   const endDateTime = new Date(`${date}T${endTime}`);
-  
+
   if (endDateTime <= startDateTime) {
     throw new Error('End time must be after start time');
   }
-  
+
   const diffMs = endDateTime - startDateTime;
   const hours = diffMs / (1000 * 60 * 60);
-  
+
   return hours;
 };
 
@@ -68,8 +68,7 @@ router.get('/', [
       .join('customers as c', 'te.customer_id', 'c.id')
       .select(
         'te.*',
-        'c.name as customer_name',
-        'c.billing_info'
+        'c.name as customer_name'
       );
 
     // Filter by user permissions
@@ -144,16 +143,16 @@ router.post('/', timeEntryValidation, requireEngineer, async (req, res) => {
     }
 
     const userId = req.user.id;
-    const { 
-      customerId, 
-      date, 
-      hours, 
-      startTime, 
-      endTime, 
-      description = '', 
+    const {
+      customerId,
+      date,
+      hours,
+      startTime,
+      endTime,
+      description = '',
       status = 'draft',
       locationData,
-      attachments 
+      attachments
     } = req.body;
 
     // Check if user has access to this customer
@@ -188,7 +187,7 @@ router.post('/', timeEntryValidation, requireEngineer, async (req, res) => {
           code: 'HOURS_REQUIRED'
         });
       }
-      
+
       try {
         computedHours = calculateHours(date, startTime, endTime);
       } catch (error) {
@@ -230,14 +229,13 @@ router.post('/', timeEntryValidation, requireEngineer, async (req, res) => {
     // Get customer info for response
     const customerInfo = await db('customers')
       .where({ id: customerId })
-      .select('name', 'billing_info')
+      .select('name')
       .first();
 
     res.status(201).json({
       timeEntry: {
         ...timeEntry,
-        customer_name: customerInfo.name,
-        billing_info: customerInfo.billing_info
+        customer_name: customerInfo.name
       }
     });
 
@@ -338,16 +336,16 @@ router.put('/:timeEntryId', timeEntryValidation, requireTimeEntryAccess, async (
     }
 
     const { timeEntryId } = req.params;
-    const { 
-      customerId, 
-      date, 
-      hours, 
-      startTime, 
-      endTime, 
-      description, 
+    const {
+      customerId,
+      date,
+      hours,
+      startTime,
+      endTime,
+      description,
       status,
       locationData,
-      attachments 
+      attachments
     } = req.body;
 
     // Get existing time entry
@@ -371,7 +369,7 @@ router.put('/:timeEntryId', timeEntryValidation, requireTimeEntryAccess, async (
           code: 'TIME_PAIR_REQUIRED'
         });
       }
-      
+
       try {
         computedHours = calculateHours(date, startTime, endTime);
       } catch (error) {
@@ -511,10 +509,10 @@ router.post('/sync', [
         results.push({ id: newEntry.id, status: 'created', entry: newEntry });
 
       } catch (error) {
-        results.push({ 
-          id: entry.id || 'unknown', 
-          status: 'error', 
-          error: error.message 
+        results.push({
+          id: entry.id || 'unknown',
+          status: 'error',
+          error: error.message
         });
       }
     }
@@ -534,4 +532,4 @@ router.post('/sync', [
   }
 });
 
-module.exports = router; 
+module.exports = router;

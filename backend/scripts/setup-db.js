@@ -65,7 +65,7 @@ async function setupDatabase() {
 async function insertSampleData(client) {
   // Insert sample customers
   await client.query(`
-    INSERT INTO customers (name, contact_info, billing_info, status)
+    INSERT INTO customers (name, contact_info, , status)
     VALUES 
       ('Acme Corp', '{"email": "contact@acme.com", "phone": "+1-555-0101", "address": "123 Business St, City, State"}', '{"hourly_rate": 150.00, "currency": "USD", "payment_terms": "Net 30"}', 'active'),
       ('TechStart Inc', '{"email": "hello@techstart.com", "phone": "+1-555-0102", "address": "456 Innovation Ave, Tech City, State"}', '{"hourly_rate": 200.00, "currency": "USD", "payment_terms": "Net 15"}', 'active'),

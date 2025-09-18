@@ -6,7 +6,6 @@ import {
   Edit,
   Archive,
   Users,
-  DollarSign,
   Building2,
   Filter,
   Search,
@@ -212,11 +211,6 @@ const Customers: React.FC = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Team
                     </th>
-                    {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Billing
-                      </th>
-                    )}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
@@ -260,19 +254,6 @@ const Customers: React.FC = () => {
                           {customer.account_manager_name && `AM: ${customer.account_manager_name}`}
                         </div>
                       </td>
-                      {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-2">
-                            <DollarSign className="w-4 h-4 text-gray-400" />
-                            <span className="text-sm text-gray-900">
-                              ${customer.billing_info?.hourly_rate || '0'}/hr
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {customer.billing_info?.currency || 'USD'}
-                          </div>
-                        </td>
-                      )}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -385,10 +366,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
       email: '',
       phone: '',
       contact_person: '',
-    },
-    billingInfo: customer?.billing_info || {
-      hourly_rate: 0,
-      currency: 'USD',
     },
     assignedUserIds: customer?.assigned_user_ids || [],
     accountManagerId: customer?.account_manager_id || '',
@@ -520,45 +497,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
             </div>
           </div>
 
-          {/* Billing Information - Admin and Account Manager only */}
-          {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
-            <div>
-              <h4 className="text-md font-medium text-gray-900 mb-4">Billing Information</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="form-label">Hourly Rate</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.billingInfo.hourly_rate}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      billingInfo: { ...formData.billingInfo, hourly_rate: parseFloat(e.target.value) || 0 }
-                    })}
-                    className="form-input"
-                    placeholder="0.00"
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Currency</label>
-                  <select
-                    value={formData.billingInfo.currency}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      billingInfo: { ...formData.billingInfo, currency: e.target.value }
-                    })}
-                    className="form-select"
-                  >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="GBP">GBP</option>
-                    <option value="CAD">CAD</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Team Assignment */}
           <div>
@@ -734,20 +672,6 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, users, onCl
             )}
           </div>
 
-          {/* Billing Information - Admin and Account Manager only */}
-          {(user?.roles.includes('admin') || user?.roles.includes('account_manager')) && (
-            <div>
-              <h4 className="text-md font-medium text-gray-900 mb-4">Billing Information</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Hourly Rate</label>
-                  <p className="text-sm text-gray-900 mt-1">
-                                            ${customer.billing_info?.hourly_rate || '0'} {customer.billing_info?.currency || 'USD'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Team Information */}
           <div>

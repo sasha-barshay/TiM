@@ -130,7 +130,6 @@ router.get('/:customerId', requireCustomerAccess, async (req, res) => {
 router.post('/', [
   body('name').isLength({ min: 1, max: 255 }).withMessage('Name is required'),
   body('contactInfo').optional().isObject().withMessage('Contact info must be an object'),
-  body('billingInfo').optional().isObject().withMessage('Billing info must be an object'),
   body('assignedUserIds').optional().isArray().withMessage('Assigned user IDs must be an array'),
   body('accountManagerId').optional().custom((value) => {
     if (value === null || value === undefined || value === '') return true;
@@ -160,7 +159,6 @@ router.post('/', [
     const {
       name,
       contactInfo,
-      billingInfo,
       assignedUserIds = [],
       accountManagerId,
       leadingEngineerId,
@@ -173,10 +171,10 @@ router.post('/', [
       const existingUsers = await db('users')
         .whereIn('id', assignedUserIds)
         .select('id');
-      
+
       const existingUserIds = existingUsers.map(u => u.id);
       const invalidIds = assignedUserIds.filter(id => !existingUserIds.includes(id));
-      
+
       if (invalidIds.length > 0) {
         return res.status(400).json({
           error: 'Invalid assigned user IDs',
@@ -191,7 +189,6 @@ router.post('/', [
       .insert({
         name,
         contact_info: contactInfo,
-        billing_info: billingInfo,
         assigned_user_ids: assignedUserIds,
         account_manager_id: accountManagerId,
         leading_engineer_id: leadingEngineerId,
@@ -216,7 +213,6 @@ router.post('/', [
 router.put('/:customerId', [
   body('name').optional().isLength({ min: 1, max: 255 }).withMessage('Name is required'),
   body('contactInfo').optional().isObject().withMessage('Contact info must be an object'),
-  body('billingInfo').optional().isObject().withMessage('Billing info must be an object'),
   body('assignedUserIds').optional().isArray().withMessage('Assigned user IDs must be an array'),
   body('accountManagerId').optional().custom((value) => {
     if (value === null || value === undefined || value === '') return true;
@@ -246,7 +242,6 @@ router.put('/:customerId', [
     const {
       name,
       contactInfo,
-      billingInfo,
       assignedUserIds,
       accountManagerId,
       leadingEngineerId,
@@ -271,10 +266,10 @@ router.put('/:customerId', [
       const existingUsers = await db('users')
         .whereIn('id', assignedUserIds)
         .select('id');
-      
+
       const existingUserIds = existingUsers.map(u => u.id);
       const invalidIds = assignedUserIds.filter(id => !existingUserIds.includes(id));
-      
+
       if (invalidIds.length > 0) {
         return res.status(400).json({
           error: 'Invalid assigned user IDs',
@@ -290,7 +285,6 @@ router.put('/:customerId', [
       .update({
         name: name || existingCustomer.name,
         contact_info: contactInfo !== undefined ? contactInfo : existingCustomer.contact_info,
-        billing_info: billingInfo !== undefined ? billingInfo : existingCustomer.billing_info,
         assigned_user_ids: assignedUserIds !== undefined ? assignedUserIds : existingCustomer.assigned_user_ids,
         account_manager_id: accountManagerId !== undefined ? accountManagerId : existingCustomer.account_manager_id,
         leading_engineer_id: leadingEngineerId !== undefined ? leadingEngineerId : existingCustomer.leading_engineer_id,
@@ -318,7 +312,7 @@ router.delete('/:customerId', requireCustomerAccess, requireAccountManager, asyn
 
     const updated = await db('customers')
       .where({ id: customerId })
-      .update({ 
+      .update({
         status: 'archived',
         updated_at: new Date()
       });
@@ -405,4 +399,4 @@ router.get('/:customerId/stats', requireCustomerAccess, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;
