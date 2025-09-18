@@ -26,7 +26,9 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
     endTime: '',
     description: '',
     status: 'draft',
-    ...initialData
+    ...initialData,
+    // Ensure date is in yyyy-MM-dd format for HTML date input
+    date: initialData.date ? format(new Date(initialData.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd')
   });
 
   // Calculate billable hours from start/end times
