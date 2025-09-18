@@ -49,7 +49,15 @@ const TimeEntries: React.FC = () => {
       toast.success('Time entry created successfully');
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to create time entry');
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to create time entry';
+      const errorDetails = error.response?.data?.details;
+      
+      if (errorDetails && Array.isArray(errorDetails)) {
+        const detailMessages = errorDetails.map((detail: any) => detail.msg).join(', ');
+        toast.error(`${errorMessage}: ${detailMessages}`);
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
@@ -64,7 +72,15 @@ const TimeEntries: React.FC = () => {
       toast.success('Time entry updated successfully');
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to update time entry');
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to update time entry';
+      const errorDetails = error.response?.data?.details;
+      
+      if (errorDetails && Array.isArray(errorDetails)) {
+        const detailMessages = errorDetails.map((detail: any) => detail.msg).join(', ');
+        toast.error(`${errorMessage}: ${detailMessages}`);
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
@@ -318,8 +334,8 @@ const TimeEntries: React.FC = () => {
                 customerId: selectedEntry.customer_id,
                 date: selectedEntry.date,
                 hours: selectedEntry.hours,
-                startTime: selectedEntry.startTime || '',
-                endTime: selectedEntry.endTime || '',
+                startTime: selectedEntry.start_time || '',
+                endTime: selectedEntry.end_time || '',
                 description: selectedEntry.description,
                 status: selectedEntry.status
               } : undefined}

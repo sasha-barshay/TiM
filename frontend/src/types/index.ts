@@ -79,12 +79,12 @@ export interface TimeEntry {
   user_id: string;
   customer_id: string;
   date: string;
-  startTime?: string;
-  endTime?: string;
+  start_time?: string;
+  end_time?: string;
   hours: number;
   description: string;
   status: 'draft' | 'submitted' | 'approved' | 'rejected';
-  locationData?: {
+  location_data?: {
     latitude?: number;
     longitude?: number;
     address?: string;

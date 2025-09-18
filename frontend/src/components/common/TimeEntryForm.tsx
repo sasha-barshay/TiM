@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Clock } from 'lucide-react';
 import { TimeEntryFormData, Customer } from '../../types';
+import toast from 'react-hot-toast';
 
 interface TimeEntryFormProps {
   customers: Customer[];
@@ -73,6 +74,34 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation: Ensure minimum requirements
+    if (!formData.customerId) {
+      toast.error('Please select a customer');
+      return;
+    }
+    
+    if (!formData.description.trim()) {
+      toast.error('Please enter a description');
+      return;
+    }
+    
+    if (formData.hours < 0.5) {
+      toast.error('Minimum 0.5 hours required');
+      return;
+    }
+    
+    // If start/end times are provided, ensure both are present
+    if (formData.startTime && !formData.endTime) {
+      toast.error('Please provide both start and end times');
+      return;
+    }
+    
+    if (formData.endTime && !formData.startTime) {
+      toast.error('Please provide both start and end times');
+      return;
+    }
+    
     onSubmit(formData);
   };
 
