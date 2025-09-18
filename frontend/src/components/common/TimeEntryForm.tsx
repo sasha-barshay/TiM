@@ -19,6 +19,13 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
   onCancel,
   isLoading = false
 }) => {
+  // Helper function to format time from database (HH:MM:SS) to form format (HH:MM)
+  const formatTimeFromDB = (time: string | undefined) => {
+    if (!time) return '';
+    // If time includes seconds (HH:MM:SS), remove them
+    return time.length > 5 ? time.slice(0, 5) : time;
+  };
+
   const [formData, setFormData] = useState<TimeEntryFormData>({
     customerId: '',
     date: format(new Date(), 'yyyy-MM-dd'),
@@ -29,7 +36,10 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
     status: 'draft',
     ...initialData,
     // Ensure date is in yyyy-MM-dd format for HTML date input
-    date: initialData.date ? format(new Date(initialData.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd')
+    date: initialData.date ? format(new Date(initialData.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+    // Format times from database to HH:MM format
+    startTime: formatTimeFromDB(initialData.startTime),
+    endTime: formatTimeFromDB(initialData.endTime)
   });
 
   // Calculate billable hours from start/end times
@@ -102,7 +112,20 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
       return;
     }
     
-    onSubmit(formData);
+    // Format times to HH:MM format (remove seconds if present)
+    const formatTimeForAPI = (time: string) => {
+      if (!time) return time;
+      // If time includes seconds (HH:MM:SS), remove them
+      return time.length > 5 ? time.slice(0, 5) : time;
+    };
+    
+    const formattedData = {
+      ...formData,
+      startTime: formatTimeForAPI(formData.startTime || ''),
+      endTime: formatTimeForAPI(formData.endTime || '')
+    };
+    
+    onSubmit(formattedData);
   };
 
   return (
