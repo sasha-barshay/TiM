@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { vi, expect } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
+
+// Extend Vitest's expect with jest-dom matchers
+expect.extend(matchers);
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
