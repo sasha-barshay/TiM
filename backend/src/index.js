@@ -162,7 +162,7 @@ process.on('SIGINT', () => {
 
 // Start server only if not in test mode
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, '127.0.0.1', () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 TiM Backend server running on port ${PORT}`);
   });
 }
