@@ -261,9 +261,12 @@ router.post('/google/exchange', [
 
   } catch (error) {
     console.error('Google token exchange error:', error);
+    console.error('Google Client ID:', process.env.GOOGLE_CLIENT_ID);
+    console.error('Google Client Secret configured:', !!process.env.GOOGLE_CLIENT_SECRET);
     res.status(500).json({
       error: 'Token exchange failed',
-      code: 'TOKEN_EXCHANGE_ERROR'
+      code: 'TOKEN_EXCHANGE_ERROR',
+      details: error.message
     });
   }
 });
