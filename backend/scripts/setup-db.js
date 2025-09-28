@@ -20,7 +20,7 @@ async function setupDatabase() {
   });
 
   try {
-    
+
     await client.connect();
 
     // Check if database exists
@@ -45,10 +45,10 @@ async function setupDatabase() {
     });
 
     await dbClient.connect();
-    
+
     const schemaPath = path.join(__dirname, '../database/schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
-    
+
     await dbClient.query(schema);
 
     // Insert sample data
@@ -66,7 +66,7 @@ async function insertSampleData(client) {
   // Insert sample customers
   await client.query(`
     INSERT INTO customers (name, contact_info, , status)
-    VALUES 
+    VALUES
       ('Acme Corp', '{"email": "contact@acme.com", "phone": "+1-555-0101", "address": "123 Business St, City, State"}', '{"hourly_rate": 150.00, "currency": "USD", "payment_terms": "Net 30"}', 'active'),
       ('TechStart Inc', '{"email": "hello@techstart.com", "phone": "+1-555-0102", "address": "456 Innovation Ave, Tech City, State"}', '{"hourly_rate": 200.00, "currency": "USD", "payment_terms": "Net 15"}', 'active'),
       ('Global Solutions', '{"email": "info@globalsolutions.com", "phone": "+1-555-0103", "address": "789 Enterprise Blvd, Metro City, State"}', '{"hourly_rate": 175.00, "currency": "USD", "payment_terms": "Net 30"}', 'active')
@@ -76,7 +76,7 @@ async function insertSampleData(client) {
   // Insert sample users (password: 'password123')
   await client.query(`
     INSERT INTO users (email, name, roles, timezone)
-    VALUES 
+    VALUES
       ('admin@tim.com', 'Admin User', ARRAY['admin'], 'UTC'),
       ('manager@tim.com', 'Account Manager', ARRAY['account_manager'], 'UTC'),
       ('engineer@tim.com', 'Engineer User', ARRAY['engineer'], 'UTC')
@@ -98,7 +98,7 @@ async function insertSampleData(client) {
 
     await client.query(`
       INSERT INTO time_entries (user_id, customer_id, date, start_time, end_time, hours, description, status)
-      VALUES 
+      VALUES
         -- Recent entries for current month
         ($1, $2, CURRENT_DATE - INTERVAL '1 day', '09:00:00', '17:00:00', 8.0, 'Frontend development work', 'approved'),
         ($1, $3, CURRENT_DATE - INTERVAL '2 days', '10:00:00', '18:00:00', 8.0, 'Backend API development', 'submitted'),
@@ -110,13 +110,13 @@ async function insertSampleData(client) {
         ($1, $4, CURRENT_DATE - INTERVAL '8 days', '10:00:00', '18:00:00', 8.0, 'Performance optimization', 'draft'),
         ($1, $3, CURRENT_DATE - INTERVAL '9 days', '09:00:00', '17:00:00', 8.0, 'Security audit', 'approved'),
         ($1, $2, CURRENT_DATE - INTERVAL '10 days', '10:00:00', '18:00:00', 8.0, 'Feature implementation', 'approved'),
-        
+
         -- Additional entries for different users
         ($5, $2, CURRENT_DATE - INTERVAL '1 day', '09:00:00', '17:00:00', 8.0, 'Project planning', 'approved'),
         ($5, $3, CURRENT_DATE - INTERVAL '2 days', '10:00:00', '18:00:00', 8.0, 'Client meeting', 'approved'),
         ($6, $2, CURRENT_DATE - INTERVAL '1 day', '09:00:00', '17:00:00', 8.0, 'System maintenance', 'approved'),
         ($6, $4, CURRENT_DATE - INTERVAL '3 days', '10:00:00', '18:00:00', 8.0, 'Bug fixes', 'submitted'),
-        
+
         -- Historical data for trends (previous month)
         ($1, $2, CURRENT_DATE - INTERVAL '35 days', '09:00:00', '17:00:00', 8.0, 'Legacy system work', 'approved'),
         ($1, $3, CURRENT_DATE - INTERVAL '36 days', '10:00:00', '18:00:00', 8.0, 'Data migration', 'approved'),
@@ -132,4 +132,4 @@ if (require.main === module) {
   setupDatabase();
 }
 
-module.exports = { setupDatabase }; 
+module.exports = { setupDatabase };

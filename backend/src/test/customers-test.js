@@ -117,10 +117,10 @@ router.post('/', [
       const existingUsers = await db('users')
         .whereIn('id', assignedUserIds)
         .select('id');
-      
+
       const existingUserIds = existingUsers.map(u => u.id);
       const invalidIds = assignedUserIds.filter(id => !existingUserIds.includes(id));
-      
+
       if (invalidIds.length > 0) {
         return res.status(400).json({
           error: 'Invalid assigned user IDs',
@@ -284,4 +284,4 @@ router.get('/:customerId', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

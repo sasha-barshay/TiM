@@ -1,0 +1,66 @@
+services:
+  # Backend API Service
+  - type: web
+    name: tim-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        value: 38029766832-datp9enkof3h02j822vm1bh83kqm8fr8.apps.googleusercontent.com
+      - key: GOOGLE_CLIENT_SECRET
+        value: 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
+      - key: GOOGLE_CLIENT_TYPE
+        value: web
+      - key: FRONTEND_URL
+        value: https://tim-frontend.onrender.com
+      - key: ALLOWED_ORIGINS
+        value: https://tim-frontend.onrender.com,http://localhost:3001
+      - key: DB_HOST
+        fromDatabase:
+          name: tim-database
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: tim-database
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: tim-database
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: tim-database
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: tim-database
+          property: password
+
+  # Frontend Static Site
+  - type: web
+    name: tim-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://tim-backend.onrender.com/api
+      - key: VITE_GOOGLE_CLIENT_ID
+        value: 38029766832-datp9enkof3h02j822vm1bh83kqm8fr8.apps.googleusercontent.com
+      - key: VITE_NODE_ENV
+        value: production
+
+databases:
+  # PostgreSQL Database
+  - name: tim-database
+    plan: free
+    databaseName: tim_production
+    user: tim_user
