@@ -5,6 +5,12 @@
 2. Render.com account
 3. Google OAuth credentials configured
 
+## Cost Overview
+- **Frontend (Static Site)**: Free
+- **Backend (Web Service)**: $7/month (Starter plan)
+- **Database (PostgreSQL)**: Free (if available) or $7/month (Starter plan)
+- **Total**: $0-$14/month depending on database plan availability
+
 ## Deployment Steps
 
 ### 1. Database Setup
@@ -12,7 +18,7 @@
 2. Click "New +" → "PostgreSQL"
 3. Configure:
    - Name: `tim-database`
-   - Plan: Free
+   - Plan: Free (if available) or Starter ($7/month)
    - Database Name: `tim_production`
    - User: `tim_user`
 4. Note down the connection details
@@ -27,7 +33,7 @@
    - Environment: Node
    - Build Command: `npm install`
    - Start Command: `npm start`
-   - Plan: Free
+   - Plan: Starter ($7/month) - Free tier no longer available for web services
 5. Set Environment Variables:
    ```
    NODE_ENV=production
@@ -56,7 +62,7 @@
    - Root Directory: `frontend`
    - Build Command: `npm install && npm run build`
    - Publish Directory: `dist`
-   - Plan: Free
+   - Plan: Free (Static sites are still free)
 5. Set Environment Variables:
    ```
    VITE_API_URL=https://tim-backend.onrender.com/api

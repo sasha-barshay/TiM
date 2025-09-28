@@ -3,7 +3,7 @@ services:
   - type: web
     name: tim-backend
     env: node
-    plan: free
+    plan: starter
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
     healthCheckPath: /api/health
@@ -47,7 +47,6 @@ services:
   - type: web
     name: tim-frontend
     env: static
-    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
     envVars:
