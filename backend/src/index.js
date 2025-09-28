@@ -18,7 +18,7 @@ const workingScheduleRoutes = require('./routes/workingSchedules');
 const { authenticateToken, requireCustomerAssignment } = require('./middleware/auth');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Security middleware
 app.use(helmet({
