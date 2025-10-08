@@ -17,6 +17,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 
 # IDE and editor files
 .vscode/
@@ -114,8 +115,13 @@ venv.bak/
 *.sqlite
 *.sqlite3
 
-# AWS
+# Cloud providers
 .aws/
+.gcloud/
+.config/gcloud/
+
+# GCP
+.gcp-credentials.json
 
 # Testing
 coverage/

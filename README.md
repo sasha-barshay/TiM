@@ -200,34 +200,33 @@ npm run test         # Run tests
 - **API Response Format**: Aligned frontend expectations with backend responses
 - **Database Setup**: Dynamic database selection based on environment
 
-## 🚀 Production Deployment
+## 🚀 Production Deployment (GCP)
+
+**Hosting:** Google Cloud Run + Neon PostgreSQL  
+**Cost:** ~$0-2/month (within free tier)
+
+### Quick Deploy
+
+```bash
+# 1. Setup Neon database (free tier)
+Visit https://neon.tech and create database
+
+# 2. Configure environment
+cp backend/env.production.template backend/.env.production
+# Edit .env.production with Neon connection string
+
+# 3. Deploy with script
+./scripts/gcp-deploy.sh
+```
+
+### Manual Deployment
+
+See **[GCP_MIGRATION.md](./GCP_MIGRATION.md)** for detailed instructions.
 
 ### Environment Variables
 
-Create `.env` files for production:
-
-**Backend (.env):**
-```env
-NODE_ENV=production
-DB_HOST=your-db-host
-DB_USER=your-db-user
-DB_PASSWORD=your-db-password
-DB_NAME=tim_prod
-JWT_SECRET=your-super-secret-jwt-key
-```
-
-**Frontend (.env):**
-```env
-VITE_API_URL=https://your-api-domain.com
-```
-
-### AWS Deployment
-
-The application is designed for AWS deployment with:
-- **RDS PostgreSQL** - Managed database
-- **EC2/Lambda** - Backend hosting
-- **S3 + CloudFront** - Frontend hosting
-- **Cognito** - User authentication (optional)
+**Backend:** See `backend/env.production.template`  
+**Frontend:** See `frontend/env.production.template`
 
 ## 🤝 Contributing
 
