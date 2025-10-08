@@ -89,9 +89,12 @@ Update Google OAuth settings:
    - `https://tim-frontend.onrender.com`
 
 ## URLs After Deployment
-- Frontend: `https://tim-frontend.onrender.com`
+- Frontend (Custom Domain): `https://tim.barlys.com`
+- Frontend (Render): `https://tim-frontend.onrender.com`
 - Backend: `https://tim-backend-zg6w.onrender.com`
 - Health Check: `https://tim-backend-zg6w.onrender.com/api/health`
+
+> **Note**: For custom domain setup instructions, see [CUSTOM_DOMAIN_SETUP.md](./CUSTOM_DOMAIN_SETUP.md)
 
 ## Testing
 1. Visit the frontend URL
