@@ -65,10 +65,12 @@
    - Plan: Free (Static sites are still free)
 5. Set Environment Variables:
    ```
-   VITE_API_URL=https://tim-backend.onrender.com/api
+   VITE_API_URL=https://tim-backend-zg6w.onrender.com/api
    VITE_GOOGLE_CLIENT_ID=38029766832-datp9enkof3h02j822vm1bh83kqm8fr8.apps.googleusercontent.com
    VITE_NODE_ENV=production
    ```
+
+   **Note**: The backend URL must match the actual deployed backend service URL. Check the backend service dashboard for the exact URL.
 
 ### 4. Database Setup
 After backend is deployed:
@@ -88,8 +90,8 @@ Update Google OAuth settings:
 
 ## URLs After Deployment
 - Frontend: `https://tim-frontend.onrender.com`
-- Backend: `https://tim-backend.onrender.com`
-- Health Check: `https://tim-backend.onrender.com/api/health`
+- Backend: `https://tim-backend-zg6w.onrender.com`
+- Health Check: `https://tim-backend-zg6w.onrender.com/api/health`
 
 ## Testing
 1. Visit the frontend URL
